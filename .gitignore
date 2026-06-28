@@ -39,3 +39,11 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# build / scratch artifacts
+build-output.log
+/_tmp_hold/
+
+# python cache (steering scripts)
+__pycache__/
+*.pyc

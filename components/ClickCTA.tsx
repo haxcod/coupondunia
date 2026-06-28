@@ -215,7 +215,7 @@ export default function ClickCTA({
 function Spinner() {
   return (
     <svg
-      className="h-4 w-4 animate-spin"
+      className="h-4 w-4 animate-spin text-[#cd3232]"
       viewBox="0 0 24 24"
       fill="none"
       aria-hidden="true"

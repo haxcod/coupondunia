@@ -53,7 +53,7 @@ export function SearchBar({
         onChange={(event) => setQuery(event.target.value)}
         placeholder={placeholder}
         autoComplete="off"
-        className="h-10 w-full rounded-control border border-border bg-card pl-4 pr-11 text-sm text-foreground placeholder:text-muted transition-colors duration-200 focus:border-accent focus:outline-none"
+        className="h-10 w-full rounded-control border border-border bg-card pl-4 pr-11 text-sm text-foreground placeholder:text-muted transition-colors duration-200 focus:border-accent focus:outline-none [&::-webkit-search-cancel-button]:appearance-none [&::-webkit-search-decoration]:appearance-none"
       />
       <button
         type="submit"

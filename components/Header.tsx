@@ -59,9 +59,13 @@ export function Header({
           )}
         </Link>
 
-        {/* Search (the sole client island on desktop) */}
-        <div className="min-w-0 flex-1">
-          <SearchBar placeholder={searchPlaceholder} />
+        {/* Search (the sole client island on desktop) — centered, capped at
+            max-w-xl so it stays balanced and never stretches edge-to-edge on
+            wide screens. */}
+        <div className="flex min-w-0 flex-1 justify-center">
+          <div className="w-full max-w-xl">
+            <SearchBar placeholder={searchPlaceholder} />
+          </div>
         </div>
 
         {/* Primary navigation — inline on md+, collapsed into a menu below md */}
