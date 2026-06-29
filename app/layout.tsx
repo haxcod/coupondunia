@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import { connection } from "next/server";
-import { Inter } from "next/font/google";
+import { Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
 
 import { Header } from "@/components/Header";
@@ -10,16 +10,18 @@ import { getSettings } from "@/lib/settings";
 import { getNavCategories } from "@/lib/catalog";
 
 /*
- * Inter is the site typeface (Req 26.3). `next/font` self-hosts the font and
- * provides an automatic system sans-serif fallback (Req 26.4); the explicit
- * `fallback` stack guarantees a graceful degrade if Inter fails to load.
- * The font is exposed as the `--font-inter` CSS variable consumed by the
+ * Plus Jakarta Sans is the site typeface (Req 26.3) — a modern geometric sans
+ * with a friendly tone that suits a deals/coupon product. `next/font` self-hosts
+ * the font and provides an automatic system sans-serif fallback (Req 26.4); the
+ * explicit `fallback` stack guarantees a graceful degrade if it fails to load.
+ * The font is exposed as the `--font-jakarta` CSS variable consumed by the
  * `--font-sans` design token in globals.css.
  */
-const inter = Inter({
+const jakarta = Plus_Jakarta_Sans({
   subsets: ["latin"],
   display: "swap",
-  variable: "--font-inter",
+  variable: "--font-jakarta",
+  weight: ["400", "500", "600", "700", "800"],
   fallback: [
     "system-ui",
     "-apple-system",
@@ -138,6 +140,10 @@ function SiteFooterFallback() {
       aria-hidden="true"
       className="mt-auto bg-footer text-foreground"
     >
+      {/* Mirror the CTA band height. */}
+      <div className="mx-auto w-full max-w-content px-4 pt-12">
+        <div className="h-32 w-full animate-pulse rounded-card bg-border sm:h-28" />
+      </div>
       <div className="mx-auto w-full max-w-content px-4 py-12">
         <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4">
           {Array.from({ length: 4 }).map((_, index) => (
@@ -149,7 +155,13 @@ function SiteFooterFallback() {
           ))}
         </div>
         <div className="mt-10 h-3 w-full animate-pulse rounded border-t border-border bg-border pt-6" />
-        <div className="mt-4 h-3 w-48 animate-pulse rounded bg-border" />
+      </div>
+      {/* Mirror the bottom bar. */}
+      <div className="border-t border-border">
+        <div className="mx-auto flex w-full max-w-content items-center justify-between px-4 py-6">
+          <div className="h-3 w-48 animate-pulse rounded bg-border" />
+          <div className="hidden h-3 w-40 animate-pulse rounded bg-border sm:block" />
+        </div>
       </div>
     </footer>
   );
@@ -161,7 +173,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${inter.variable} h-full antialiased`}>
+    <html lang="en" className={`${jakarta.variable} h-full antialiased`}>
       {/*
        * Layout shell: global background (#F8F8F6) + foreground tokens, full
        * height flex column so the Footer sits at the bottom. The sticky Header

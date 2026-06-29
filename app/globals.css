@@ -16,6 +16,8 @@
   --color-border: #e8e8e5;
   --color-accent: #cd3232;
   --color-accent-hover: #b02a2a;
+  --color-highlight: #0d9488; /* complementary teal for promo strip / accents */
+  --color-highlight-hover: #0f766e;
   --color-success: #2e7d32;
   --color-warning: #f57c00;
   --color-error: #c62828;
@@ -31,9 +33,9 @@
   /* Content width constraint (Req 26.6) */
   --container-content: 1200px;
 
-  /* Typography (Req 26.3/26.4) — Inter via next/font with system fallback */
+  /* Typography (Req 26.3/26.4) — Plus Jakarta Sans via next/font with system fallback */
   --font-sans:
-    var(--font-inter), system-ui, -apple-system, "Segoe UI", Roboto, Helvetica,
+    var(--font-jakarta), system-ui, -apple-system, "Segoe UI", Roboto, Helvetica,
     Arial, sans-serif;
 }
 

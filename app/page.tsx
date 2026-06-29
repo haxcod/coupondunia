@@ -8,6 +8,12 @@ import { ProductCard } from "@/components/ProductCard";
 import { CouponCard } from "@/components/CouponCard";
 import { ResponsiveGrid } from "@/components/ResponsiveGrid";
 import { StoreLogo } from "@/components/StoreLogo";
+import {
+  PromoStrip,
+  WaysToSave,
+  WhyChooseUs,
+  HomeFaq,
+} from "@/components/home-sections";
 import { getActiveBanners, getHomepageData } from "@/lib/catalog";
 import { getSettings } from "@/lib/settings";
 import {
@@ -57,9 +63,15 @@ export default function Home() {
   // cached reads to request time via `connection()` (Req 1, 25.8).
   return (
     <main className="flex-1">
+      {/* Static announcement strip — rendered in the shell, above the data. */}
+      <PromoStrip />
       <Suspense fallback={<HomeFallback />}>
         <HomeContent />
       </Suspense>
+      {/* Static editorial sections — always visible in the shell. */}
+      <WaysToSave />
+      <WhyChooseUs />
+      <HomeFaq />
     </main>
   );
 }
@@ -186,24 +198,31 @@ async function HomeContent() {
         </SectionShell>
       ) : null}
 
-      {/* Popular Stores strip — up to 12 active stores (Req 1.12). */}
+      {/* Popular Stores — RMN-style circular logo grid, up to 12 active stores
+          (Req 1.12). Wraps to a responsive grid instead of a flat strip. */}
       {popularStores.length > 0 ? (
         <section
           aria-label="Popular Stores"
           className="mx-auto w-full max-w-content px-4 py-8"
         >
-          <h2 className="mb-4 text-lg font-bold tracking-tight text-foreground">
+          <h2 className="mb-6 text-lg font-bold tracking-tight text-foreground">
             Popular Stores
           </h2>
-          <ul className="flex gap-4 overflow-x-auto pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+          <ul className="flex gap-x-4 gap-y-6 overflow-x-auto pb-2 [scrollbar-width:none] sm:grid sm:grid-cols-4 sm:overflow-visible sm:pb-0 md:grid-cols-6 [&::-webkit-scrollbar]:hidden">
             {popularStores.map((store) => (
               <li key={store.id} className="shrink-0">
                 <Link
                   href={`/search?q=${encodeURIComponent(store.name)}`}
-                  className="flex w-24 cursor-pointer flex-col items-center gap-2 rounded-card border border-border bg-card p-3 transition-colors duration-200 hover:border-accent"
+                  className="group flex cursor-pointer flex-col items-center gap-2"
                 >
-                  <StoreLogo name={store.name} logoUrl={store.logoUrl} size={48} />
-                  <span className="w-full truncate text-center text-xs font-medium text-secondary">
+                  <span className="flex h-20 w-20 items-center justify-center rounded-full border border-border bg-card shadow-sm transition-all duration-200 group-hover:border-accent group-hover:shadow-md">
+                    <StoreLogo
+                      name={store.name}
+                      logoUrl={store.logoUrl}
+                      size={56}
+                    />
+                  </span>
+                  <span className="w-full truncate text-center text-xs font-medium text-secondary transition-colors duration-200 group-hover:text-accent">
                     {store.name}
                   </span>
                 </Link>
@@ -264,15 +283,31 @@ function SectionShell({
 }: SectionShellProps) {
   return (
     <section className="mx-auto w-full max-w-content px-4 py-8">
-      <div className="mb-4 flex items-baseline justify-between gap-4">
-        <h2 className="text-lg font-bold tracking-tight text-foreground">
+      <div className="mb-5 flex items-baseline justify-between gap-4">
+        <h2 className="flex items-center gap-2.5 text-lg font-bold tracking-tight text-foreground sm:text-xl">
+          <span
+            aria-hidden="true"
+            className="h-5 w-1.5 rounded-badge bg-accent"
+          />
           {title}
         </h2>
         <Link
           href={viewAllHref}
-          className="shrink-0 cursor-pointer whitespace-nowrap text-sm font-medium text-accent transition-colors duration-200 hover:text-accent-hover"
+          className="group inline-flex shrink-0 cursor-pointer items-center gap-1 whitespace-nowrap text-sm font-semibold text-accent transition-colors duration-200 hover:text-accent-hover"
         >
           {viewAllLabel}
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth={2.5}
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            aria-hidden="true"
+            className="h-3.5 w-3.5 transition-transform duration-200 group-hover:translate-x-0.5"
+          >
+            <path d="M5 12h14M13 6l6 6-6 6" />
+          </svg>
         </Link>
       </div>
       {children}

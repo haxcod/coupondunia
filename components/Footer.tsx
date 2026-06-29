@@ -121,6 +121,39 @@ export function Footer({
 
   return (
     <footer className="mt-auto bg-footer text-foreground">
+      {/* Call-to-action band — a gradient "never miss a deal" prompt that links
+          to the deals listing (real route, not a placeholder newsletter form). */}
+      <div className="mx-auto w-full max-w-content px-4 pt-12">
+        <div className="flex flex-col items-center gap-4 rounded-card bg-gradient-to-r from-accent to-highlight px-6 py-8 text-center sm:flex-row sm:justify-between sm:text-left">
+          <div>
+            <h2 className="text-lg font-bold text-white sm:text-xl">
+              Never miss a deal
+            </h2>
+            <p className="mt-1 text-sm text-white/90">
+              Fresh coupons and cashback offers, updated every single day.
+            </p>
+          </div>
+          <Link
+            href="/deals"
+            className="inline-flex shrink-0 cursor-pointer items-center gap-1.5 rounded-control bg-white px-5 py-2.5 text-sm font-bold text-accent transition-colors duration-200 hover:bg-white/90"
+          >
+            Browse all deals
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth={2.5}
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden="true"
+              className="h-4 w-4"
+            >
+              <path d="M5 12h14M13 6l6 6-6 6" />
+            </svg>
+          </Link>
+        </div>
+      </div>
+
       <div className="mx-auto w-full max-w-content px-4 py-12">
         <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4">
           {/* Brand: logo, tagline, social links */}
@@ -145,7 +178,7 @@ export function Footer({
             ) : null}
 
             {populatedSocial.length > 0 ? (
-              <ul className="mt-4 flex items-center gap-3">
+              <ul className="mt-5 flex items-center gap-3">
                 {populatedSocial.map((icon) => (
                   <li key={icon.key}>
                     <a
@@ -153,7 +186,7 @@ export function Footer({
                       target="_blank"
                       rel="noopener noreferrer"
                       aria-label={icon.label}
-                      className="flex h-9 w-9 cursor-pointer items-center justify-center rounded-control border border-border bg-card text-secondary transition-colors duration-200 hover:text-accent"
+                      className="flex h-9 w-9 cursor-pointer items-center justify-center rounded-full border border-border bg-card text-secondary transition-colors duration-200 hover:border-accent hover:text-accent"
                     >
                       <svg
                         viewBox="0 0 24 24"
@@ -173,10 +206,10 @@ export function Footer({
           {/* Navigation link columns */}
           {columns.map((column) => (
             <nav key={column.title} aria-label={column.title}>
-              <h2 className="text-sm font-semibold text-foreground">
+              <h2 className="text-xs font-semibold uppercase tracking-wide text-foreground">
                 {column.title}
               </h2>
-              <ul className="mt-3 space-y-2">
+              <ul className="mt-4 space-y-2.5">
                 {column.links.map((link) => (
                   <li key={link.href}>
                     <Link
@@ -196,11 +229,32 @@ export function Footer({
         <p className="mt-10 border-t border-border pt-6 text-xs leading-relaxed text-muted">
           {affiliateDisclaimer}
         </p>
+      </div>
 
-        {/* Copyright (Req 1.13) */}
-        <p className="mt-4 text-xs text-muted">
-          © {year} {siteName}. All rights reserved.
-        </p>
+      {/* Bottom bar — copyright + condensed legal links. */}
+      <div className="border-t border-border">
+        <div className="mx-auto flex w-full max-w-content flex-col items-center gap-3 px-4 py-6 text-center sm:flex-row sm:justify-between sm:text-left">
+          <p className="text-xs text-muted">
+            © {year} {siteName}. All rights reserved.
+          </p>
+          <ul className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2">
+            {[
+              { label: 'About', href: '/about' },
+              { label: 'Contact', href: '/contact' },
+              { label: 'Terms', href: '/terms' },
+              { label: 'Privacy', href: '/privacy' },
+            ].map((link) => (
+              <li key={link.href}>
+                <Link
+                  href={link.href}
+                  className="cursor-pointer text-xs text-muted transition-colors duration-200 hover:text-accent"
+                >
+                  {link.label}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </div>
       </div>
     </footer>
   );

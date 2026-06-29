@@ -100,9 +100,10 @@ export function CouponCard({ deal }: CouponCardProps) {
       <div className="mt-auto pt-4">
         <Link
           href={`/deal/${deal.slug}`}
-          className="inline-flex w-full cursor-pointer items-center justify-center gap-1.5 rounded-control bg-accent px-4 py-2.5 text-sm font-semibold text-white transition-colors duration-200 hover:bg-accent-hover"
+          className="inline-flex w-full cursor-pointer items-center justify-center gap-1.5 rounded-control bg-accent px-2 py-2.5 text-xs font-semibold whitespace-nowrap text-white transition-colors duration-200 hover:bg-accent-hover sm:px-4 sm:text-sm"
         >
-          GET COUPON CODE
+          <span className="sm:hidden">GET CODE</span>
+          <span className="hidden sm:inline">GET COUPON CODE</span>
           <svg
             aria-hidden="true"
             viewBox="0 0 24 24"
@@ -113,7 +114,7 @@ export function CouponCard({ deal }: CouponCardProps) {
             strokeWidth="2"
             strokeLinecap="round"
             strokeLinejoin="round"
-            className="h-4 w-4"
+            className="h-4 w-4 shrink-0"
           >
             <path d="M5 12h14" />
             <path d="m12 5 7 7-7 7" />

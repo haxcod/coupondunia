@@ -96,6 +96,9 @@ export default function HeroCarousel({ banners }: HeroCarouselProps) {
   const goNextRef = useRef(goNext);
   goNextRef.current = goNext;
 
+  // Tracks the X position where a touch gesture began, for swipe detection.
+  const touchStartXRef = useRef<number | null>(null);
+
   useEffect(() => {
     if (count <= 1 || isPaused || reducedMotion) return;
     const timer = window.setInterval(() => {
@@ -111,6 +114,28 @@ export default function HeroCarousel({ banners }: HeroCarouselProps) {
   const resume = () => setIsPaused(false);
   const hasMultiple = count > 1;
 
+  // Swipe support (mobile): record the start X, then on release advance/rewind
+  // when the horizontal travel exceeds a small threshold. Auto-advance is
+  // paused during the gesture and resumed afterwards.
+  const SWIPE_THRESHOLD_PX = 40;
+  const handleTouchStart = (event: React.TouchEvent) => {
+    pause();
+    touchStartXRef.current = event.touches[0]?.clientX ?? null;
+  };
+  const handleTouchEnd = (event: React.TouchEvent) => {
+    const startX = touchStartXRef.current;
+    touchStartXRef.current = null;
+    if (startX !== null && hasMultiple) {
+      const deltaX = (event.changedTouches[0]?.clientX ?? startX) - startX;
+      if (deltaX <= -SWIPE_THRESHOLD_PX) {
+        goNext();
+      } else if (deltaX >= SWIPE_THRESHOLD_PX) {
+        goPrev();
+      }
+    }
+    resume();
+  };
+
   return (
     <section
       aria-roledescription="carousel"
@@ -118,8 +143,8 @@ export default function HeroCarousel({ banners }: HeroCarouselProps) {
       className="relative w-full overflow-hidden rounded-card bg-card"
       onMouseEnter={pause}
       onMouseLeave={resume}
-      onTouchStart={pause}
-      onTouchEnd={resume}
+      onTouchStart={handleTouchStart}
+      onTouchEnd={handleTouchEnd}
       onFocusCapture={pause}
       onBlurCapture={resume}
     >
@@ -146,7 +171,7 @@ export default function HeroCarousel({ banners }: HeroCarouselProps) {
             type="button"
             onClick={goPrev}
             aria-label="Previous banner"
-            className="absolute left-3 top-1/2 z-10 flex h-10 w-10 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full bg-card/80 text-foreground shadow transition-colors duration-200 hover:bg-card focus-visible:bg-card"
+            className="absolute left-2 top-1/2 z-10 flex h-8 w-8 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full bg-card/80 text-foreground shadow transition-colors duration-200 hover:bg-card focus-visible:bg-card sm:left-3 sm:h-10 sm:w-10"
           >
             <ChevronIcon direction="left" />
           </button>
@@ -154,7 +179,7 @@ export default function HeroCarousel({ banners }: HeroCarouselProps) {
             type="button"
             onClick={goNext}
             aria-label="Next banner"
-            className="absolute right-3 top-1/2 z-10 flex h-10 w-10 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full bg-card/80 text-foreground shadow transition-colors duration-200 hover:bg-card focus-visible:bg-card"
+            className="absolute right-2 top-1/2 z-10 flex h-8 w-8 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full bg-card/80 text-foreground shadow transition-colors duration-200 hover:bg-card focus-visible:bg-card sm:right-3 sm:h-10 sm:w-10"
           >
             <ChevronIcon direction="right" />
           </button>

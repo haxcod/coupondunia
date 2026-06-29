@@ -61,35 +61,54 @@ function CategoryCard({ category }: { category: CategoryCardDTO }) {
     <li>
       <Link
         href={`/category/${category.slug}`}
-        className="group flex h-full cursor-pointer items-center gap-4 rounded-card border border-border bg-card p-4 shadow-sm transition-colors duration-200 hover:border-accent focus-visible:border-accent"
+        className="group flex h-full cursor-pointer flex-col gap-4 rounded-card border border-border bg-card p-5 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-accent hover:shadow-md focus-visible:border-accent"
       >
-        <span className="flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-control border border-border bg-background">
-          {category.iconUrl ? (
-            <Image
-              // The catalog stores icons on external object storage. Until task
-              // 11.1 registers `images.remotePatterns`, optimization would
-              // reject an unconfigured host, so we serve the source directly to
-              // degrade gracefully; 11.1 can drop `unoptimized` once configured.
-              unoptimized
-              src={category.iconUrl}
-              alt={category.name}
-              width={56}
-              height={56}
-              className="h-full w-full object-cover"
-            />
-          ) : (
-            <CategoryIconPlaceholder />
-          )}
-        </span>
+        <div className="flex items-start justify-between gap-3">
+          <span className="flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-control bg-highlight/10 text-highlight">
+            {category.iconUrl ? (
+              <Image
+                // The catalog stores icons on external object storage. Until task
+                // 11.1 registers `images.remotePatterns`, optimization would
+                // reject an unconfigured host, so we serve the source directly to
+                // degrade gracefully; 11.1 can drop `unoptimized` once configured.
+                unoptimized
+                src={category.iconUrl}
+                alt={category.name}
+                width={56}
+                height={56}
+                className="h-full w-full object-cover"
+              />
+            ) : (
+              <CategoryIconPlaceholder />
+            )}
+          </span>
 
-        <span className="min-w-0">
-          <span className="block truncate font-semibold text-foreground transition-colors duration-200 group-hover:text-accent">
+          <span
+            aria-hidden="true"
+            className="flex h-8 w-8 items-center justify-center rounded-full text-secondary transition-all duration-200 group-hover:bg-accent group-hover:text-white"
+          >
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth={2.5}
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-0.5"
+            >
+              <path d="M5 12h14M13 6l6 6-6 6" />
+            </svg>
+          </span>
+        </div>
+
+        <div className="min-w-0">
+          <span className="block truncate text-base font-bold text-foreground transition-colors duration-200 group-hover:text-accent">
             {category.name}
           </span>
-          <span className="mt-0.5 block text-sm text-secondary">
+          <span className="mt-2 inline-flex items-center rounded-badge bg-background px-2.5 py-1 text-xs font-semibold text-secondary">
             {category.activeProductCount} {productLabel}
           </span>
-        </span>
+        </div>
       </Link>
     </li>
   );
