@@ -198,31 +198,31 @@ async function HomeContent() {
         </SectionShell>
       ) : null}
 
-      {/* Popular Stores — RMN-style circular logo grid, up to 12 active stores
-          (Req 1.12). Wraps to a responsive grid instead of a flat strip. */}
+      {/* Popular Stores — clean card grid, up to 12 active stores (Req 1.12). */}
       {popularStores.length > 0 ? (
         <section
           aria-label="Popular Stores"
           className="mx-auto w-full max-w-content px-4 py-8"
         >
-          <h2 className="mb-6 text-lg font-bold tracking-tight text-foreground">
-            Popular Stores
-          </h2>
-          <ul className="flex gap-x-4 gap-y-6 overflow-x-auto pb-2 [scrollbar-width:none] sm:grid sm:grid-cols-4 sm:overflow-visible sm:pb-0 md:grid-cols-6 [&::-webkit-scrollbar]:hidden">
+          <div className="mb-5 flex items-baseline justify-between gap-4">
+            <h2 className="flex items-center gap-2.5 text-lg font-bold tracking-tight text-foreground sm:text-xl">
+              <span aria-hidden="true" className="h-5 w-1.5 rounded-badge bg-accent" />
+              Popular Stores
+            </h2>
+          </div>
+          <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 md:grid-cols-4 lg:grid-cols-6">
             {popularStores.map((store) => (
-              <li key={store.id} className="shrink-0">
+              <li key={store.id}>
                 <Link
                   href={`/search?q=${encodeURIComponent(store.name)}`}
-                  className="group flex cursor-pointer flex-col items-center gap-2"
+                  className="group flex h-full cursor-pointer flex-col items-center justify-center gap-3 rounded-card border border-border bg-card p-4 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-accent hover:shadow-md"
                 >
-                  <span className="flex h-20 w-20 items-center justify-center rounded-full border border-border bg-card shadow-sm transition-all duration-200 group-hover:border-accent group-hover:shadow-md">
-                    <StoreLogo
-                      name={store.name}
-                      logoUrl={store.logoUrl}
-                      size={56}
-                    />
-                  </span>
-                  <span className="w-full truncate text-center text-xs font-medium text-secondary transition-colors duration-200 group-hover:text-accent">
+                  <StoreLogo
+                    name={store.name}
+                    logoUrl={store.logoUrl}
+                    size={52}
+                  />
+                  <span className="w-full truncate text-center text-sm font-semibold text-foreground transition-colors duration-200 group-hover:text-accent">
                     {store.name}
                   </span>
                 </Link>
