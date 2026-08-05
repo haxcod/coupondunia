@@ -2,19 +2,16 @@ import { Suspense } from "react";
 import { connection } from "next/server";
 import type { Metadata } from "next";
 import Link from "next/link";
+import Image from "next/image";
 
-import HeroCarousel from "@/components/HeroCarousel";
-import { ProductCard } from "@/components/ProductCard";
+import { SearchBar } from "@/components/SearchBar";
 import { CouponCard } from "@/components/CouponCard";
-import { ResponsiveGrid } from "@/components/ResponsiveGrid";
+import { ProductCard } from "@/components/ProductCard";
+import { CategoryTile } from "@/components/CategoryTile";
 import { StoreLogo } from "@/components/StoreLogo";
-import {
-  PromoStrip,
-  WaysToSave,
-  WhyChooseUs,
-  HomeFaq,
-} from "@/components/home-sections";
-import { getActiveBanners, getHomepageData } from "@/lib/catalog";
+import { BrandStrip } from "@/components/BrandStrip";
+import { Newsletter } from "@/components/Newsletter";
+import { getHomepageData } from "@/lib/catalog";
 import { getSettings } from "@/lib/settings";
 import {
   buildMetadata,
@@ -22,20 +19,7 @@ import {
   stringifyJsonLd,
 } from "@/lib/seo";
 
-/** Default featured-products heading when none is admin-configured (Req 1.16). */
-const FEATURED_SECTION_TITLE = "Featured Deals";
-
-/**
- * Homepage metadata (Req 24.x): canonical `/`, Open Graph tags, site name from
- * Settings. Falls back to the tagline / a default description when the SEO
- * default description is blank.
- */
 export async function generateMetadata(): Promise<Metadata> {
-  // Metadata is sourced from the database-backed Settings singleton, which is
-  // unavailable during prerender. `connection()` defers metadata resolution to
-  // request time (streamed metadata, `generate-metadata.md`) so the build never
-  // reads the database, while `getSettings()` keeps its `use cache` for runtime
-  // caching (`connection.md`, `use-cache.md`).
   await connection();
   const settings = await getSettings();
   const title = settings.tagline
@@ -44,7 +28,7 @@ export async function generateMetadata(): Promise<Metadata> {
   const description =
     settings.defaultMetaDescription ||
     settings.tagline ||
-    "Discover the best deals, coupons, and offers from top stores.";
+    "Discover the best promo codes, discounts, and cashback offers from your favorite brands. Never pay full price again.";
 
   return buildMetadata({
     title,
@@ -56,87 +40,160 @@ export async function generateMetadata(): Promise<Metadata> {
   });
 }
 
+/* The design's hero photo strip — the designer's own lifestyle shots. */
+const HERO_TILES = [
+  "/figma/hero-1.webp",
+  "/figma/hero-2.webp",
+  "/figma/hero-3.webp",
+  "/figma/hero-4.webp",
+  "/figma/hero-5.webp",
+  "/figma/hero-6.webp",
+];
+
 export default function Home() {
-  // The homepage body is entirely database-backed (banners, featured products,
-  // category sections, coupons, stores). Rendering it behind `<Suspense>` lets
-  // the static shell prerender WITHOUT a database; `HomeContent` defers the
-  // cached reads to request time via `connection()` (Req 1, 25.8).
   return (
     <main className="flex-1">
-      {/* Static announcement strip — rendered in the shell, above the data. */}
-      <PromoStrip />
+      {/* Hero — static, rendered in the shell. */}
+      <section className="mx-auto w-full max-w-content px-4 pb-6 pt-16 text-center">
+        {/* Entrance sequence: headline, then sub-copy, then the search field. */}
+        <h1 className="animate-rise mx-auto max-w-4xl text-4xl font-extrabold leading-[1.1] tracking-tight sm:text-5xl lg:text-6xl">
+          <span className="block text-accent">Save More With Verified</span>
+          <span className="block text-foreground">Coupons &amp; Deals</span>
+        </h1>
+        <p className="animate-rise delay-1 mx-auto mt-6 max-w-2xl text-base text-secondary sm:text-lg">
+          Discover the best promo codes, discounts, and cashback offers from your
+          favorite brands. Never pay full price again.
+        </p>
+        <div className="animate-rise delay-2 mx-auto mt-8 max-w-2xl">
+          <SearchBar
+            cta="Find Deals"
+            size="lg"
+            placeholder="Search for stores, brands, or categories..."
+          />
+        </div>
+
+        {/* The photo strip deals itself in left-to-right, like a hand of cards. */}
+        <div
+          aria-hidden="true"
+          className="mt-14 flex items-end justify-center gap-1 overflow-hidden sm:gap-3"
+        >
+          {HERO_TILES.map((src, index) => (
+            <div
+              key={src}
+              className={`animate-deal-in relative h-28 w-[15%] shrink-0 transition-transform duration-300 hover:-translate-y-2 sm:h-52 ${
+                index % 2 === 0 ? "-rotate-2" : "rotate-2"
+              }`}
+              style={{ animationDelay: `${300 + index * 70}ms` }}
+            >
+              <Image
+                src={src}
+                alt=""
+                fill
+                sizes="(max-width: 640px) 16vw, 220px"
+                priority={index < 3}
+                className="object-contain"
+              />
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <BrandStrip />
+
       <Suspense fallback={<HomeFallback />}>
         <HomeContent />
       </Suspense>
-      {/* Static editorial sections — always visible in the shell. */}
-      <WaysToSave />
-      <WhyChooseUs />
-      <HomeFaq />
+
+      <Newsletter />
     </main>
   );
 }
 
 async function HomeContent() {
-  // Defer the cached catalog/settings reads to request time so prerender does
-  // not require a database; the loaders retain `use cache` for runtime ISR
-  // (`connection.md`, `use-cache.md`).
   await connection();
-  const [settings, banners, homepage] = await Promise.all([
+  const [settings, homepage] = await Promise.all([
     getSettings(),
-    getActiveBanners(),
     getHomepageData(),
   ]);
 
-  const {
-    pillRowCategories,
-    featuredProducts,
-    categorySections,
-    todaysBestCoupons,
-    popularStores,
-  } = homepage;
+  const { pillRowCategories, featuredProducts, todaysBestCoupons, popularStores } =
+    homepage;
 
-  // WebSite + SearchAction structured data for the homepage (Req 24.9).
   const websiteJsonLd = buildWebSiteJsonLd({ siteName: settings.siteName });
 
   return (
     <>
-      {/* WebSite + SearchAction JSON-LD (Req 24.9). */}
       <script
         type="application/ld+json"
-        // stringifyJsonLd escapes `<`/`>`/`&` so the payload can't break out
-        // of the script element (Req 24.9).
         dangerouslySetInnerHTML={{ __html: stringifyJsonLd(websiteJsonLd) }}
       />
 
-      {/* Hero carousel — hidden when there are no active banners (Req 1.3/1.6).
-          HeroCarousel renders null on an empty list; guard the wrapper too so
-          no empty spacing remains. */}
-      {banners.length > 0 ? (
-        <section className="mx-auto w-full max-w-content px-4 pt-4">
-          <HeroCarousel banners={banners} />
-        </section>
-      ) : null}
-
-      {/* Category pill row — up to 10 active categories + a "View All" pill
-          (Req 1.8). Horizontally scrollable on small viewports. */}
-      {pillRowCategories.length > 0 ? (
-        <section
-          aria-label="Browse categories"
-          className="mx-auto w-full max-w-content px-4 pt-6"
-        >
-          <div className="flex gap-2 overflow-x-auto pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-            {pillRowCategories.map((category) => (
+      {/* Today's Trending Coupons & Deals */}
+      {todaysBestCoupons.length > 0 ? (
+        <section className="reveal mx-auto w-full max-w-content px-4 py-12">
+          <SectionHeading
+            title="Today's Trending Coupons & Deals"
+            subtitle="Explore our selection of handpicked coupons that cater to your preferences and shopping habits as per categories."
+          />
+          {/* Real categories, each linking into the filtered deals listing. */}
+          <div className="mt-6 flex justify-center gap-6 overflow-x-auto border-b border-border pb-0 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+            <Link
+              href="/deals"
+              className="whitespace-nowrap border-b-2 border-accent pb-3 text-sm font-semibold text-accent"
+            >
+              All
+            </Link>
+            {pillRowCategories.slice(0, 7).map((category) => (
               <Link
                 key={category.id}
-                href={`/category/${category.slug}`}
-                className="inline-flex shrink-0 cursor-pointer items-center whitespace-nowrap rounded-badge border border-border bg-card px-4 py-2 text-sm font-medium text-foreground transition-colors duration-200 hover:border-accent hover:text-accent"
+                href={`/deals?category=${encodeURIComponent(category.slug)}`}
+                className="whitespace-nowrap border-b-2 border-transparent pb-3 text-sm font-medium text-secondary transition-colors duration-200 hover:border-accent hover:text-accent"
               >
                 {category.name}
               </Link>
             ))}
+          </div>
+          <ul className="reveal-stagger mt-8 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            {todaysBestCoupons.map((deal) => (
+              <li key={deal.id}>
+                <CouponCard deal={deal} />
+              </li>
+            ))}
+          </ul>
+          <div className="mt-8 flex justify-center">
             <Link
-              href="/categories"
-              className="inline-flex shrink-0 cursor-pointer items-center whitespace-nowrap rounded-badge bg-accent px-4 py-2 text-sm font-semibold text-card transition-colors duration-200 hover:bg-accent-hover"
+              href="/deals"
+              className="press rounded-control bg-accent px-8 py-3 text-sm font-semibold text-white hover:bg-accent-hover hover:shadow-lg hover:shadow-accent/25"
+            >
+              Load More
+            </Link>
+          </div>
+        </section>
+      ) : null}
+
+      {/* Popular Stores */}
+      {popularStores.length > 0 ? (
+        <section className="reveal mx-auto w-full max-w-content px-4 py-12">
+          <SectionHeading title="Popular Stores" />
+          <ul className="reveal-stagger mt-8 grid grid-cols-3 gap-4 sm:grid-cols-4 md:grid-cols-6">
+            {popularStores.map((store) => (
+              <li key={store.id}>
+                <Link
+                  href={`/search?q=${encodeURIComponent(store.name)}`}
+                  className="flex h-full flex-col items-center justify-center gap-3 rounded-card border border-border bg-card p-5 transition-all duration-200 hover:-translate-y-0.5 hover:border-accent hover:shadow-md"
+                >
+                  <StoreLogo name={store.name} logoUrl={store.logoUrl} size={48} />
+                  <span className="w-full truncate text-center text-xs font-semibold text-foreground">
+                    {store.name}
+                  </span>
+                </Link>
+              </li>
+            ))}
+          </ul>
+          <div className="mt-8 flex justify-center">
+            <Link
+              href="/stores"
+              className="press rounded-control bg-accent px-8 py-3 text-sm font-semibold text-white hover:bg-accent-hover hover:shadow-lg hover:shadow-accent/25"
             >
               View All
             </Link>
@@ -144,88 +201,32 @@ async function HomeContent() {
         </section>
       ) : null}
 
-      {/* Featured products — default title "Featured Deals"; hidden when none
-          are featured (Req 1.9/1.15/1.16), with a link to the deals listing. */}
+      {/* Browse By Categories */}
+      {pillRowCategories.length > 0 ? (
+        <section className="reveal mx-auto w-full max-w-content px-4 py-12">
+          <SectionHeading title="Browse By Categories" />
+          <ul className="reveal-stagger mt-8 grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-6">
+            {pillRowCategories.slice(0, 6).map((category) => (
+              <li key={category.id}>
+                <CategoryTile
+                  name={category.name}
+                  slug={category.slug}
+                  iconUrl={category.iconUrl}
+                />
+              </li>
+            ))}
+          </ul>
+        </section>
+      ) : null}
+
+      {/* Featured Deals */}
       {featuredProducts.length > 0 ? (
-        <SectionShell
-          title={FEATURED_SECTION_TITLE}
-          viewAllHref="/deals"
-          viewAllLabel="View all deals"
-        >
-          <ResponsiveGrid aria-label={FEATURED_SECTION_TITLE}>
+        <section className="reveal mx-auto w-full max-w-content px-4 py-12">
+          <SectionHeading title="Featured Deals" />
+          <ul className="reveal-stagger mt-8 grid grid-cols-2 gap-5 sm:grid-cols-3 lg:grid-cols-4">
             {featuredProducts.map((product) => (
-              <div role="listitem" key={product.id}>
+              <li key={product.id}>
                 <ProductCard product={product} />
-              </div>
-            ))}
-          </ResponsiveGrid>
-        </SectionShell>
-      ) : null}
-
-      {/* Category-wise sections — each "show on homepage" category with 4–6
-          active products, ordered by ascending display order (Req 1.10). */}
-      {categorySections.map((section) => (
-        <SectionShell
-          key={section.category.id}
-          title={section.category.name}
-          viewAllHref={`/category/${section.category.slug}`}
-          viewAllLabel={`View all in ${section.category.name}`}
-        >
-          <ResponsiveGrid aria-label={section.category.name}>
-            {section.products.map((product) => (
-              <div role="listitem" key={product.id}>
-                <ProductCard product={product} />
-              </div>
-            ))}
-          </ResponsiveGrid>
-        </SectionShell>
-      ))}
-
-      {/* Today's Best Coupons — 6–8 active featured deals (Req 1.11). */}
-      {todaysBestCoupons.length > 0 ? (
-        <SectionShell
-          title="Today's Best Coupons"
-          viewAllHref="/deals"
-          viewAllLabel="View all coupons"
-        >
-          <ResponsiveGrid aria-label="Today's Best Coupons">
-            {todaysBestCoupons.map((deal) => (
-              <div role="listitem" key={deal.id}>
-                <CouponCard deal={deal} />
-              </div>
-            ))}
-          </ResponsiveGrid>
-        </SectionShell>
-      ) : null}
-
-      {/* Popular Stores — clean card grid, up to 12 active stores (Req 1.12). */}
-      {popularStores.length > 0 ? (
-        <section
-          aria-label="Popular Stores"
-          className="mx-auto w-full max-w-content px-4 py-8"
-        >
-          <div className="mb-5 flex items-baseline justify-between gap-4">
-            <h2 className="flex items-center gap-2.5 text-lg font-bold tracking-tight text-foreground sm:text-xl">
-              <span aria-hidden="true" className="h-5 w-1.5 rounded-badge bg-accent" />
-              Popular Stores
-            </h2>
-          </div>
-          <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 md:grid-cols-4 lg:grid-cols-6">
-            {popularStores.map((store) => (
-              <li key={store.id}>
-                <Link
-                  href={`/search?q=${encodeURIComponent(store.name)}`}
-                  className="group flex h-full cursor-pointer flex-col items-center justify-center gap-3 rounded-card border border-border bg-card p-4 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-accent hover:shadow-md"
-                >
-                  <StoreLogo
-                    name={store.name}
-                    logoUrl={store.logoUrl}
-                    size={52}
-                  />
-                  <span className="w-full truncate text-center text-sm font-semibold text-foreground transition-colors duration-200 group-hover:text-accent">
-                    {store.name}
-                  </span>
-                </Link>
               </li>
             ))}
           </ul>
@@ -235,82 +236,46 @@ async function HomeContent() {
   );
 }
 
-/** Lightweight skeleton streamed in the static shell while homepage data loads. */
-function HomeFallback() {
+interface SectionHeadingProps {
+  title: string;
+  subtitle?: string;
+}
+
+/** A centered section heading with an optional supporting line. */
+function SectionHeading({ title, subtitle }: SectionHeadingProps) {
   return (
-    <div aria-hidden="true">
-      <section className="mx-auto w-full max-w-content px-4 pt-4">
-        <div className="aspect-[16/6] w-full animate-pulse rounded-card bg-border" />
-      </section>
-      <section className="mx-auto w-full max-w-content px-4 pt-6">
-        <div className="flex gap-2 overflow-hidden pb-2">
-          {Array.from({ length: 8 }).map((_, index) => (
-            <div
-              key={index}
-              className="h-9 w-28 shrink-0 animate-pulse rounded-badge bg-border"
-            />
-          ))}
-        </div>
-      </section>
-      <section className="mx-auto w-full max-w-content px-4 py-8">
-        <div className="mb-4 h-6 w-48 animate-pulse rounded-control bg-border" />
-        <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
-          {Array.from({ length: 8 }).map((_, index) => (
-            <div
-              key={index}
-              className="aspect-[3/4] animate-pulse rounded-card bg-border"
-            />
-          ))}
-        </div>
-      </section>
+    <div className="text-center">
+      <h2 className="text-2xl font-extrabold tracking-tight text-foreground sm:text-3xl">
+        {title}
+      </h2>
+      {/* A short accent rule that draws itself as the section scrolls in. */}
+      <span
+        aria-hidden="true"
+        className="rule-draw mx-auto mt-3 block h-1 w-16 rounded-badge bg-accent"
+      />
+      {subtitle ? (
+        <p className="mx-auto mt-3 max-w-2xl text-sm text-secondary">
+          {subtitle}
+        </p>
+      ) : null}
     </div>
   );
 }
 
-interface SectionShellProps {
-  title: string;
-  viewAllHref: string;
-  viewAllLabel: string;
-  children: React.ReactNode;
-}
-
-/** A titled homepage section with a "view all" link aligned to the heading. */
-function SectionShell({
-  title,
-  viewAllHref,
-  viewAllLabel,
-  children,
-}: SectionShellProps) {
+/** Skeleton streamed in the static shell while homepage data loads. */
+function HomeFallback() {
   return (
-    <section className="mx-auto w-full max-w-content px-4 py-8">
-      <div className="mb-5 flex items-baseline justify-between gap-4">
-        <h2 className="flex items-center gap-2.5 text-lg font-bold tracking-tight text-foreground sm:text-xl">
-          <span
-            aria-hidden="true"
-            className="h-5 w-1.5 rounded-badge bg-accent"
+    <div aria-hidden="true" className="mx-auto w-full max-w-content px-4 py-12">
+      <div className="mx-auto h-8 w-72 skeleton rounded-control" />
+      <div className="mx-auto mt-3 h-4 w-96 max-w-full skeleton rounded" />
+      <div className="mt-8 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+        {Array.from({ length: 6 }).map((_, index) => (
+          <div
+            key={index}
+            className="h-48 skeleton rounded-card border border-border"
           />
-          {title}
-        </h2>
-        <Link
-          href={viewAllHref}
-          className="group inline-flex shrink-0 cursor-pointer items-center gap-1 whitespace-nowrap text-sm font-semibold text-accent transition-colors duration-200 hover:text-accent-hover"
-        >
-          {viewAllLabel}
-          <svg
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth={2.5}
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            aria-hidden="true"
-            className="h-3.5 w-3.5 transition-transform duration-200 group-hover:translate-x-0.5"
-          >
-            <path d="M5 12h14M13 6l6 6-6 6" />
-          </svg>
-        </Link>
+        ))}
       </div>
-      {children}
-    </section>
+    </div>
   );
 }

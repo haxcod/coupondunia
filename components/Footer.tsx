@@ -1,17 +1,13 @@
 /*
- * Footer (Server Component) — site-wide footer (Req 1.13, 20.5).
- *
- * Renders the site logo, tagline, navigation link columns, an affiliate
- * disclaimer, a copyright notice, and social links — using the `#EFEFED`
- * footer background (`bg-footer`, Req 1.13). Only *populated* social links are
- * rendered; any link left blank is omitted entirely (Req 20.5).
- *
- * Brand icons use official Simple Icons SVG paths (not emoji) per the
- * ui-ux-pro-max icon rule. All dynamic data arrives via props with sensible
- * defaults so the footer renders standalone; pages pass real values sourced
- * from Settings/catalog. The component never reads settings itself.
+ * Footer (Server Component) — the purple Coupon Saga footer: brand lockup +
+ * blurb + social icons on the left, three link columns, and a centered
+ * copyright line. Dynamic data (brand name, tagline, social URLs, disclaimer)
+ * arrives via props with sensible defaults; the link columns are fixed site
+ * chrome. Brand icons use Simple Icons paths (not emoji).
  */
 import Link from 'next/link';
+
+import { Logo } from './Logo';
 
 export interface FooterSocialLinks {
   facebook?: string;
@@ -31,65 +27,63 @@ export interface FooterColumn {
 }
 
 export interface FooterProps {
-  /** Brand name shown as a wordmark when no logo image is configured. */
   siteName?: string;
-  /** Short brand tagline rendered under the logo. */
   tagline?: string;
-  /** Optional logo image URL; falls back to the site-name wordmark. */
   logoUrl?: string | null;
-  /** Social profile URLs; empty/blank entries are omitted (Req 20.5). */
   social?: FooterSocialLinks;
-  /** Navigation link columns; defaults to the standard site columns. */
   columns?: FooterColumn[];
-  /** Affiliate disclaimer text (Req 1.13). */
   affiliateDisclaimer?: string;
 }
 
 const DEFAULT_COLUMNS: FooterColumn[] = [
   {
-    title: 'Company',
+    title: 'Categories',
     links: [
-      { label: 'About', href: '/about' },
-      { label: 'Contact', href: '/contact' },
+      { label: 'Fashion & Apparel', href: '/categories' },
+      { label: 'Electronics', href: '/categories' },
+      { label: 'Travel & Flights', href: '/categories' },
+      { label: 'Food & Dining', href: '/categories' },
     ],
   },
   {
     title: 'Legal',
     links: [
-      { label: 'Terms', href: '/terms' },
-      { label: 'Privacy', href: '/privacy' },
+      { label: 'Terms of Service', href: '/terms' },
+      { label: 'Privacy Policy', href: '/privacy' },
+      { label: 'Cookie Policy', href: '/privacy' },
+      { label: 'Accessibility', href: '/about' },
     ],
   },
   {
-    title: 'Browse',
+    title: 'Quick Links',
     links: [
-      { label: 'All Categories', href: '/categories' },
-      { label: 'All Coupons', href: '/coupons' },
+      { label: 'About Us', href: '/about' },
+      { label: 'Contact Support', href: '/contact' },
+      { label: 'Careers', href: '/about' },
+      { label: 'Blog', href: '/blogs' },
     ],
   },
 ];
 
-const DEFAULT_DISCLAIMER =
-  'DealSpark is reader-supported. When you buy through links on our site we may earn an affiliate commission at no additional cost to you. Prices and availability are accurate as of the date and time indicated and are subject to change.';
+const DEFAULT_TAGLINE =
+  'Your ultimate destination for verified coupons, promo codes, and cashback offers. Save more on your favorite brands everyday.';
 
 interface SocialIconDef {
   key: keyof FooterSocialLinks;
   label: string;
-  /** Official Simple Icons 24×24 path. */
   path: string;
 }
 
-/* Official Simple Icons brand paths (24×24 viewBox). */
 const SOCIAL_ICONS: SocialIconDef[] = [
-  {
-    key: 'facebook',
-    label: 'Facebook',
-    path: 'M9.101 23.691v-7.98H6.627v-3.667h2.474v-1.58c0-4.085 1.848-5.978 5.858-5.978.401 0 .955.042 1.468.103a8.68 8.68 0 0 1 1.141.195v3.325a8.623 8.623 0 0 0-.653-.036 26.805 26.805 0 0 0-.733-.009c-.707 0-1.259.096-1.675.309a1.686 1.686 0 0 0-.679.622c-.258.42-.374.995-.374 1.752v1.297h3.919l-.386 2.103-.287 1.564h-3.246v8.245C19.396 23.238 24 18.179 24 12.044c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.628 3.874 10.35 9.101 11.647Z',
-  },
   {
     key: 'instagram',
     label: 'Instagram',
     path: 'M12 0C8.74 0 8.333.015 7.053.072 5.775.132 4.905.333 4.14.63c-.789.306-1.459.717-2.126 1.384S.935 3.35.63 4.14C.333 4.905.131 5.775.072 7.053.012 8.333 0 8.74 0 12s.015 3.667.072 4.947c.06 1.277.261 2.148.558 2.913.306.788.717 1.459 1.384 2.126.667.666 1.336 1.079 2.126 1.384.766.296 1.636.499 2.913.558C8.333 23.988 8.74 24 12 24s3.667-.015 4.947-.072c1.277-.06 2.148-.262 2.913-.558.788-.306 1.459-.718 2.126-1.384.666-.667 1.079-1.335 1.384-2.126.296-.765.499-1.636.558-2.913.06-1.28.072-1.687.072-4.947s-.015-3.667-.072-4.947c-.06-1.277-.262-2.149-.558-2.913-.306-.789-.718-1.459-1.384-2.126C21.319 1.347 20.651.935 19.86.63c-.765-.297-1.636-.499-2.913-.558C15.667.012 15.26 0 12 0zm0 2.16c3.203 0 3.585.016 4.85.071 1.17.055 1.805.249 2.227.415.562.217.96.477 1.382.896.419.42.679.819.896 1.381.164.422.36 1.057.413 2.227.057 1.266.07 1.646.07 4.85s-.015 3.585-.074 4.85c-.061 1.17-.256 1.805-.421 2.227-.224.562-.479.96-.899 1.382-.419.419-.824.679-1.38.896-.42.164-1.065.36-2.235.413-1.274.057-1.649.07-4.859.07-3.211 0-3.586-.015-4.859-.074-1.171-.061-1.816-.256-2.236-.421-.569-.224-.96-.479-1.379-.899-.421-.419-.69-.824-.9-1.38-.165-.42-.359-1.065-.42-2.235-.045-1.26-.061-1.649-.061-4.844 0-3.196.016-3.586.061-4.861.061-1.17.255-1.814.42-2.234.21-.57.479-.96.9-1.381.419-.419.81-.689 1.379-.898.42-.166 1.051-.361 2.221-.421 1.275-.045 1.65-.06 4.859-.06l.045.03zm0 3.678c-3.405 0-6.162 2.76-6.162 6.162 0 3.405 2.76 6.162 6.162 6.162 3.405 0 6.162-2.76 6.162-6.162 0-3.405-2.76-6.162-6.162-6.162zM12 16c-2.21 0-4-1.79-4-4s1.79-4 4-4 4 1.79 4 4-1.79 4-4 4zm7.846-10.405c0 .795-.646 1.44-1.44 1.44-.795 0-1.44-.646-1.44-1.44 0-.794.646-1.439 1.44-1.439.793-.001 1.44.645 1.44 1.439z',
+  },
+  {
+    key: 'facebook',
+    label: 'Facebook',
+    path: 'M9.101 23.691v-7.98H6.627v-3.667h2.474v-1.58c0-4.085 1.848-5.978 5.858-5.978.401 0 .955.042 1.468.103a8.68 8.68 0 0 1 1.141.195v3.325a8.623 8.623 0 0 0-.653-.036 26.805 26.805 0 0 0-.733-.009c-.707 0-1.259.096-1.675.309a1.686 1.686 0 0 0-.679.622c-.258.42-.374.995-.374 1.752v1.297h3.919l-.386 2.103-.287 1.564h-3.246v8.245C19.396 23.238 24 18.179 24 12.044c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.628 3.874 10.35 9.101 11.647Z',
   },
   {
     key: 'twitter',
@@ -98,123 +92,96 @@ const SOCIAL_ICONS: SocialIconDef[] = [
   },
   {
     key: 'youtube',
-    label: 'YouTube',
-    path: 'M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z',
+    label: 'LinkedIn',
+    path: 'M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.225 0z',
   },
 ];
 
 export function Footer({
-  siteName = 'DealSpark',
-  tagline = 'Discover the best deals, coupons, and offers from top stores.',
+  siteName = 'Coupon Saga',
+  tagline = DEFAULT_TAGLINE,
   logoUrl = null,
   social = {},
   columns = DEFAULT_COLUMNS,
-  affiliateDisclaimer = DEFAULT_DISCLAIMER,
+  affiliateDisclaimer,
 }: FooterProps) {
-  // Render only social links that carry a non-blank URL (Req 20.5).
-  const populatedSocial = SOCIAL_ICONS.map((icon) => ({
-    ...icon,
-    url: (social[icon.key] ?? '').trim(),
-  })).filter((icon) => icon.url.length > 0);
-
   const year = new Date().getFullYear();
 
   return (
-    <footer className="mt-auto bg-footer text-foreground">
-      {/* Call-to-action band — a gradient "never miss a deal" prompt that links
-          to the deals listing (real route, not a placeholder newsletter form). */}
-      <div className="mx-auto w-full max-w-content px-4 pt-12">
-        <div className="flex flex-col items-center gap-4 rounded-card bg-gradient-to-r from-accent to-highlight px-6 py-8 text-center sm:flex-row sm:justify-between sm:text-left">
+    <footer className="mt-auto bg-footer text-white">
+      <div className="mx-auto w-full max-w-content px-4 py-14">
+        <div className="grid grid-cols-1 gap-10 md:grid-cols-[1.6fr_1fr_1fr_1fr]">
+          {/* Brand */}
           <div>
-            <h2 className="text-lg font-bold text-white sm:text-xl">
-              Never miss a deal
-            </h2>
-            <p className="mt-1 text-sm text-white/90">
-              Fresh coupons and cashback offers, updated every single day.
-            </p>
-          </div>
-          <Link
-            href="/deals"
-            className="inline-flex shrink-0 cursor-pointer items-center gap-1.5 rounded-control bg-white px-5 py-2.5 text-sm font-bold text-accent transition-colors duration-200 hover:bg-white/90"
-          >
-            Browse all deals
-            <svg
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth={2.5}
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              aria-hidden="true"
-              className="h-4 w-4"
-            >
-              <path d="M5 12h14M13 6l6 6-6 6" />
-            </svg>
-          </Link>
-        </div>
-      </div>
-
-      <div className="mx-auto w-full max-w-content px-4 py-12">
-        <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4">
-          {/* Brand: logo, tagline, social links */}
-          <div>
-            <Link
-              href="/"
-              aria-label={`${siteName} home`}
-              className="inline-flex cursor-pointer items-center gap-2"
-            >
+            {/* The design seats the footer wordmark on a white panel so it reads
+                against the purple ground. */}
+            <span className="inline-flex rounded-control bg-white px-3 py-2">
               {logoUrl ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img src={logoUrl} alt={siteName} className="h-8 w-auto" />
+                <Link
+                  href="/"
+                  aria-label={`${siteName} home`}
+                  className="inline-flex"
+                >
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={logoUrl} alt={siteName} className="h-7 w-auto" />
+                </Link>
               ) : (
-                <span className="text-xl font-bold tracking-tight text-foreground">
-                  {siteName}
-                </span>
+                <Logo />
               )}
-            </Link>
+            </span>
 
             {tagline ? (
-              <p className="mt-3 max-w-xs text-sm text-secondary">{tagline}</p>
+              <p className="mt-4 max-w-xs text-sm leading-relaxed text-white/70">
+                {tagline}
+              </p>
             ) : null}
 
-            {populatedSocial.length > 0 ? (
-              <ul className="mt-5 flex items-center gap-3">
-                {populatedSocial.map((icon) => (
+            <ul className="mt-6 flex items-center gap-3">
+              {SOCIAL_ICONS.map((icon) => {
+                const url = (social[icon.key] ?? '').trim();
+                const iconSvg = (
+                  <svg
+                    viewBox="0 0 24 24"
+                    fill="currentColor"
+                    className="h-5 w-5"
+                    aria-hidden="true"
+                  >
+                    <path d={icon.path} />
+                  </svg>
+                );
+                return (
                   <li key={icon.key}>
-                    <a
-                      href={icon.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      aria-label={icon.label}
-                      className="flex h-9 w-9 cursor-pointer items-center justify-center rounded-full border border-border bg-card text-secondary transition-colors duration-200 hover:border-accent hover:text-accent"
-                    >
-                      <svg
-                        viewBox="0 0 24 24"
-                        fill="currentColor"
-                        className="h-5 w-5"
-                        aria-hidden="true"
+                    {url ? (
+                      <a
+                        href={url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        aria-label={icon.label}
+                        className="flex h-9 w-9 items-center justify-center rounded-full bg-white/10 text-white transition-all duration-300 ease-out hover:-translate-y-0.5 hover:scale-110 hover:bg-white hover:text-accent"
                       >
-                        <path d={icon.path} />
-                      </svg>
-                    </a>
+                        {iconSvg}
+                      </a>
+                    ) : (
+                      <span className="flex h-9 w-9 items-center justify-center rounded-full bg-white/10 text-white/80">
+                        {iconSvg}
+                      </span>
+                    )}
                   </li>
-                ))}
-              </ul>
-            ) : null}
+                );
+              })}
+            </ul>
           </div>
 
-          {/* Navigation link columns */}
+          {/* Link columns */}
           {columns.map((column) => (
             <nav key={column.title} aria-label={column.title}>
-              <h2 className="text-xs font-semibold uppercase tracking-wide text-foreground">
-                {column.title}
-              </h2>
-              <ul className="mt-4 space-y-2.5">
+              <h2 className="text-sm font-semibold text-white">{column.title}</h2>
+              <ul className="mt-4 space-y-3">
                 {column.links.map((link) => (
-                  <li key={link.href}>
+                  <li key={`${column.title}-${link.label}`}>
                     <Link
                       href={link.href}
-                      className="cursor-pointer text-sm text-secondary transition-colors duration-200 hover:text-accent"
+                      className="inline-block text-sm text-white/70 transition-all duration-200 ease-out hover:translate-x-0.5 hover:text-white"
                     >
                       {link.label}
                     </Link>
@@ -225,35 +192,16 @@ export function Footer({
           ))}
         </div>
 
-        {/* Affiliate disclaimer (Req 1.13) */}
-        <p className="mt-10 border-t border-border pt-6 text-xs leading-relaxed text-muted">
-          {affiliateDisclaimer}
-        </p>
+        {affiliateDisclaimer ? (
+          <p className="mt-10 text-xs leading-relaxed text-white/45">
+            {affiliateDisclaimer}
+          </p>
+        ) : null}
       </div>
 
-      {/* Bottom bar — copyright + condensed legal links. */}
-      <div className="border-t border-border">
-        <div className="mx-auto flex w-full max-w-content flex-col items-center gap-3 px-4 py-6 text-center sm:flex-row sm:justify-between sm:text-left">
-          <p className="text-xs text-muted">
-            © {year} {siteName}. All rights reserved.
-          </p>
-          <ul className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2">
-            {[
-              { label: 'About', href: '/about' },
-              { label: 'Contact', href: '/contact' },
-              { label: 'Terms', href: '/terms' },
-              { label: 'Privacy', href: '/privacy' },
-            ].map((link) => (
-              <li key={link.href}>
-                <Link
-                  href={link.href}
-                  className="cursor-pointer text-xs text-muted transition-colors duration-200 hover:text-accent"
-                >
-                  {link.label}
-                </Link>
-              </li>
-            ))}
-          </ul>
+      <div className="border-t border-white/15">
+        <div className="mx-auto w-full max-w-content px-4 py-6 text-center text-sm text-white/70">
+          {year} © {siteName}. All Rights Reserved.
         </div>
       </div>
     </footer>

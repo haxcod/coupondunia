@@ -54,7 +54,7 @@ export function ProductCardImage({ src, alt }: ProductCardImageProps) {
       fill
       loading="lazy"
       sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 240px"
-      className="object-cover"
+      className="img-in object-cover"
       onError={() => setFailed(true)}
     />
   );

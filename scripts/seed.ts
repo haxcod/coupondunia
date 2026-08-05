@@ -89,13 +89,13 @@ async function seedSettings(): Promise<void> {
   }
   await Settings.create({
     singletonKey: 'global',
-    siteName: 'DealSpark',
+    siteName: 'Coupon Saga',
     tagline: 'Smart deals & coupons, every day.',
-    contactEmail: process.env.CONTACT_NOTIFICATION_EMAIL ?? 'admin@dealspark.local',
+    contactEmail: process.env.CONTACT_NOTIFICATION_EMAIL ?? 'admin@couponsaga.local',
     defaultMetaDescription:
       'Discover the best affiliate deals and coupon codes across top Indian stores.',
     defaultAffiliateDisclosure:
-      'DealSpark may earn a commission when you buy through links on this site.',
+      'Coupon Saga may earn a commission when you buy through links on this site.',
     social: {
       facebook: 'https://facebook.com/dealspark',
       instagram: 'https://instagram.com/dealspark',
@@ -185,7 +185,7 @@ async function seedDemoContent(): Promise<void> {
     homepageSectionTitle: `Top ${c.name} Deals`,
     displayOrder: c.order,
     status: 'active',
-    metaTitle: `${c.name} Deals & Coupons | DealSpark`,
+    metaTitle: `${c.name} Deals & Coupons | Coupon Saga`,
     metaDescription: `Save big on ${c.name.toLowerCase()} with verified coupons and offers.`,
   }));
   const topCategories = await Category.insertMany(topCategorySeeds);
@@ -341,19 +341,26 @@ async function seedDemoContent(): Promise<void> {
   console.log(`• Inserted ${deals.length} deals.`);
 
   // ---- Banners -----------------------------------------------------------
+  /*
+   * Banner artwork comes from the design files (public/figma). The artwork
+   * already carries its own headline and CTA, so `headline`/`ctaText` are left
+   * blank — the carousel would otherwise render a second overlay on top.
+   */
   const bannerDefs = [
-    { internalName: 'Big Billion Days', headline: 'Big Billion Days Are Here', ctaText: 'Shop Now', link: 'https://www.flipkart.com', order: 1 },
-    { internalName: 'Great Indian Sale', headline: 'Great Indian Festival', ctaText: 'Explore', link: 'https://www.amazon.in', order: 2 },
-    { internalName: 'End of Reason Sale', headline: 'Myntra EORS Live', ctaText: 'Grab Deals', link: 'https://www.myntra.com', order: 3 },
-    { internalName: 'Beauty Sale', headline: 'Nykaa Pink Friday Sale', ctaText: 'Shop Beauty', link: 'https://www.nykaa.com', order: 4 },
+    { internalName: 'Great Indian Festival', image: '/figma/banner-amazon-festival.webp', link: 'https://www.amazon.in', order: 1 },
+    { internalName: 'End of Season Sale', image: '/figma/banner-flipkart-sale.webp', link: 'https://www.flipkart.com', order: 2 },
+    { internalName: 'Ajio Menswear Edit', image: '/figma/banner-ajio-menswear.webp', link: 'https://www.ajio.com', order: 3 },
+    { internalName: 'Electronics Up To 90% Off', image: '/figma/banner-amazon-90off.webp', link: 'https://www.amazon.in', order: 4 },
+    { internalName: 'Lifestyle Flat 50% Off', image: '/figma/banner-lifestyle-50off.webp', link: 'https://www.lifestylestores.com', order: 5 },
+    { internalName: 'Monsoon Fits', image: '/figma/banner-monsoon-fits.webp', link: 'https://www.myntra.com', order: 6 },
   ];
   const banners = await Banner.insertMany(
     bannerDefs.map((b) => ({
       internalName: b.internalName,
-      imageUrl: img(`banner-${b.internalName}`, 1200),
-      mobileImageUrl: img(`banner-mobile-${b.internalName}`, 800),
-      headline: b.headline,
-      ctaText: b.ctaText,
+      imageUrl: b.image,
+      mobileImageUrl: null,
+      headline: null,
+      ctaText: null,
       linkUrl: b.link,
       linkTarget: 'new_tab' as const,
       displayOrder: b.order,

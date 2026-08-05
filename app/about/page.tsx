@@ -11,9 +11,9 @@ import { buildMetadata } from "@/lib/seo";
 
 export function generateMetadata(): Metadata {
   return buildMetadata({
-    title: "About DealSpark",
+    title: "About Coupon Saga",
     description:
-      "Learn about DealSpark — how we surface the best deals, coupons, and offers from top stores so you always shop at the right price.",
+      "Learn about Coupon Saga — how we surface the best deals, coupons, and offers from top stores so you always shop at the right price.",
     path: "/about",
   });
 }
@@ -22,10 +22,10 @@ export default function AboutPage() {
   return (
     <main className="mx-auto w-full max-w-3xl flex-1 px-4 py-12 sm:py-16">
       <h1 className="text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">
-        About DealSpark
+        About Coupon Saga
       </h1>
       <p className="mt-4 text-lg text-secondary">
-        DealSpark helps shoppers discover genuine savings across thousands of
+        Coupon Saga helps shoppers discover genuine savings across thousands of
         products, coupons, and limited-time offers from trusted stores.
       </p>
 

@@ -99,9 +99,10 @@ export function MobileMenu({ links }: MobileMenuProps) {
         id="mobile-nav-panel"
         aria-label="Primary"
         inert={!open}
-        className={`fixed right-0 top-0 z-50 flex h-full w-72 max-w-[80vw] flex-col bg-card shadow-xl transition-transform duration-300 ease-out md:hidden ${
-          open ? 'translate-x-0' : 'translate-x-full'
-        }`}
+        // Explicit transform (not the Tailwind translate utility) so the closed
+        // drawer is reliably pushed fully off-screen across engines.
+        style={{ transform: open ? 'translateX(0)' : 'translateX(100%)' }}
+        className="fixed right-0 top-0 z-50 flex h-full w-72 max-w-[80vw] flex-col bg-card shadow-xl transition-transform duration-300 ease-out md:hidden"
       >
         <div className="flex h-[var(--header-height)] shrink-0 items-center justify-between border-b border-border px-4">
           <span className="text-sm font-semibold text-foreground">Menu</span>
@@ -129,7 +130,7 @@ export function MobileMenu({ links }: MobileMenuProps) {
         </div>
 
         <nav aria-label="Primary" className="flex flex-col py-2">
-          {links.map((link) => {
+          {links.map((link, index) => {
             const active =
               pathname === link.href ||
               (link.href !== '/' && pathname.startsWith(`${link.href}/`));
@@ -138,9 +139,16 @@ export function MobileMenu({ links }: MobileMenuProps) {
                 key={link.href}
                 href={link.href}
                 aria-current={active ? 'page' : undefined}
-                className={`block cursor-pointer px-5 py-3.5 text-base font-medium transition-colors duration-200 hover:bg-background hover:text-accent ${
+                /*
+                 * Each link eases in behind the drawer once it opens, and resets
+                 * while closed so the sequence replays on every open.
+                 */
+                style={{
+                  transitionDelay: open ? `${120 + index * 45}ms` : '0ms',
+                }}
+                className={`block cursor-pointer px-5 py-3.5 text-base font-medium transition-all duration-300 ease-out hover:bg-surface hover:text-accent ${
                   active ? 'text-accent' : 'text-foreground'
-                }`}
+                } ${open ? 'translate-x-0 opacity-100' : 'translate-x-4 opacity-0'}`}
               >
                 {link.label}
               </Link>

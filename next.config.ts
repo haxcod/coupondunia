@@ -58,6 +58,14 @@ const nextConfig: NextConfig = {
   // DealSpark design relies on (Req 24.1, 25.8).
   cacheComponents: true,
 
+  // Pin the workspace root to this project. There is a stray `package-lock.json`
+  // in the user's home directory, so Turbopack otherwise infers an ambiguous
+  // root and warns on every build/dev. `__dirname` is this file's directory,
+  // i.e. the project root.
+  turbopack: {
+    root: __dirname,
+  },
+
   images: {
     remotePatterns: buildRemotePatterns(),
   },

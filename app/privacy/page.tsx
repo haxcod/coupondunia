@@ -12,7 +12,7 @@ export function generateMetadata(): Metadata {
   return buildMetadata({
     title: "Privacy Policy",
     description:
-      "How DealSpark collects, uses, and protects your information, including contact submissions, analytics, and your choices.",
+      "How Coupon Saga collects, uses, and protects your information, including contact submissions, analytics, and your choices.",
     path: "/privacy",
   });
 }

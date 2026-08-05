@@ -11,14 +11,14 @@ import { ImageResponse } from "next/og";
  * points the per-page metadata fallback here so the Open Graph image tag is
  * never empty when a page has no image of its own (Req 24.8).
  *
- * It renders a branded 1200×630 DealSpark card on the brand background. It uses
+ * It renders a branded 1200×630 Coupon Saga card on the brand background. It uses
  * only static branding (no database, no request-time APIs) so it is statically
  * optimized at build time — keeping `next build` working without a database and
  * ensuring the image carries no affiliate/destination URLs (Req 7.9 / 24.1).
  */
 
 // Image metadata — exported per the Next 16 `opengraph-image` convention.
-export const alt = "DealSpark — Discover the best deals, coupons, and offers";
+export const alt = "Coupon Saga — Discover the best deals, coupons, and offers";
 
 export const size = {
   width: 1200,
@@ -34,7 +34,7 @@ const BRAND_SECONDARY = "#6b6b6b";
 const BRAND_ACCENT = "#ff5722";
 const BRAND_CARD = "#ffffff";
 
-const SITE_NAME = "DealSpark";
+const SITE_NAME = "Coupon Saga";
 const SITE_TAGLINE = "Discover the best deals, coupons, and offers from top stores.";
 
 export default function Image() {

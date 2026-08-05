@@ -1,26 +1,25 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import { connection } from "next/server";
-import { Plus_Jakarta_Sans } from "next/font/google";
+import { Poppins } from "next/font/google";
 import "./globals.css";
 
 import { Header } from "@/components/Header";
-import { Footer, type FooterColumn } from "@/components/Footer";
+import { Footer } from "@/components/Footer";
+import { BackToTop } from "@/components/BackToTop";
 import { getSettings } from "@/lib/settings";
-import { getNavCategories } from "@/lib/catalog";
+import { getSiteBaseUrl } from "@/lib/seo";
 
 /*
- * Plus Jakarta Sans is the site typeface (Req 26.3) — a modern geometric sans
- * with a friendly tone that suits a deals/coupon product. `next/font` self-hosts
- * the font and provides an automatic system sans-serif fallback (Req 26.4); the
- * explicit `fallback` stack guarantees a graceful degrade if it fails to load.
- * The font is exposed as the `--font-jakarta` CSS variable consumed by the
- * `--font-sans` design token in globals.css.
+ * Poppins is the Coupon Saga typeface — the geometric sans used across the
+ * design's headings and body. `next/font` self-hosts it with a system fallback
+ * stack for graceful degradation. Exposed as `--font-poppins`, which the
+ * `--font-sans` token in globals.css consumes.
  */
-const jakarta = Plus_Jakarta_Sans({
+const poppins = Poppins({
   subsets: ["latin"],
   display: "swap",
-  variable: "--font-jakarta",
+  variable: "--font-poppins",
   weight: ["400", "500", "600", "700", "800"],
   fallback: [
     "system-ui",
@@ -34,55 +33,14 @@ const jakarta = Plus_Jakarta_Sans({
 });
 
 export const metadata: Metadata = {
-  title: "DealSpark",
-  description: "Discover the best deals, coupons, and offers from top stores.",
+  // Resolves relative Open Graph / Twitter image URLs to absolute ones and
+  // silences Next's "metadataBase is not set" warning. Sourced from
+  // NEXT_PUBLIC_SITE_URL (with a safe fallback) so it is correct per environment.
+  metadataBase: new URL(getSiteBaseUrl()),
+  title: "Coupon Saga",
+  description:
+    "Discover the best promo codes, discounts, and cashback offers from your favorite brands.",
 };
-
-/**
- * Build the footer navigation columns (Req 1.13). The first two columns are the
- * fixed Company / Legal links; the third surfaces the most prominent active
- * categories (falling back to a static Browse column when none exist yet).
- */
-function buildFooterColumns(
-  categories: { name: string; slug: string }[],
-): FooterColumn[] {
-  const columns: FooterColumn[] = [
-    {
-      title: "Company",
-      links: [
-        { label: "About", href: "/about" },
-        { label: "Contact", href: "/contact" },
-      ],
-    },
-    {
-      title: "Legal",
-      links: [
-        { label: "Terms", href: "/terms" },
-        { label: "Privacy", href: "/privacy" },
-      ],
-    },
-  ];
-
-  if (categories.length > 0) {
-    columns.push({
-      title: "Top Categories",
-      links: categories.slice(0, 6).map((category) => ({
-        label: category.name,
-        href: `/category/${category.slug}`,
-      })),
-    });
-  } else {
-    columns.push({
-      title: "Browse",
-      links: [
-        { label: "All Categories", href: "/categories" },
-        { label: "All Coupons", href: "/deals" },
-      ],
-    });
-  }
-
-  return columns;
-}
 
 /**
  * Request-time Header (Req 1.1, 20.5). The site identity (name/logo) lives in
@@ -107,12 +65,7 @@ async function SiteHeader() {
  */
 async function SiteFooter() {
   await connection();
-  const [settings, navCategories] = await Promise.all([
-    getSettings(),
-    getNavCategories(),
-  ]);
-
-  const footerColumns = buildFooterColumns(navCategories);
+  const settings = await getSettings();
 
   return (
     <Footer
@@ -120,7 +73,6 @@ async function SiteFooter() {
       tagline={settings.tagline || undefined}
       logoUrl={settings.logoUrl}
       social={settings.social}
-      columns={footerColumns}
       affiliateDisclaimer={settings.defaultAffiliateDisclosure || undefined}
     />
   );
@@ -138,29 +90,29 @@ function SiteFooterFallback() {
   return (
     <footer
       aria-hidden="true"
-      className="mt-auto bg-footer text-foreground"
+      className="mt-auto bg-footer"
     >
       {/* Mirror the CTA band height. */}
       <div className="mx-auto w-full max-w-content px-4 pt-12">
-        <div className="h-32 w-full animate-pulse rounded-card bg-border sm:h-28" />
+        <div className="h-32 w-full rounded-card bg-white/10 sm:h-28" />
       </div>
       <div className="mx-auto w-full max-w-content px-4 py-12">
         <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4">
           {Array.from({ length: 4 }).map((_, index) => (
             <div key={index} className="space-y-3">
-              <div className="h-5 w-32 animate-pulse rounded bg-border" />
-              <div className="h-3 w-24 animate-pulse rounded bg-border" />
-              <div className="h-3 w-20 animate-pulse rounded bg-border" />
+              <div className="h-5 w-32 rounded bg-white/15" />
+              <div className="h-3 w-24 rounded bg-white/10" />
+              <div className="h-3 w-20 rounded bg-white/10" />
             </div>
           ))}
         </div>
-        <div className="mt-10 h-3 w-full animate-pulse rounded border-t border-border bg-border pt-6" />
+        <div className="mt-10 h-3 w-full rounded bg-white/10" />
       </div>
       {/* Mirror the bottom bar. */}
-      <div className="border-t border-border">
+      <div className="border-t border-white/15">
         <div className="mx-auto flex w-full max-w-content items-center justify-between px-4 py-6">
-          <div className="h-3 w-48 animate-pulse rounded bg-border" />
-          <div className="hidden h-3 w-40 animate-pulse rounded bg-border sm:block" />
+          <div className="h-3 w-48 rounded bg-white/10" />
+          <div className="hidden h-3 w-40 rounded bg-white/10 sm:block" />
         </div>
       </div>
     </footer>
@@ -173,7 +125,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${jakarta.variable} h-full antialiased`}>
+    <html lang="en" className={`${poppins.variable} h-full antialiased`}>
       {/*
        * Layout shell: global background (#F8F8F6) + foreground tokens, full
        * height flex column so the Footer sits at the bottom. The sticky Header
@@ -195,6 +147,7 @@ export default function RootLayout({
         <Suspense fallback={<SiteFooterFallback />}>
           <SiteFooter />
         </Suspense>
+        <BackToTop />
       </body>
     </html>
   );

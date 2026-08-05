@@ -94,14 +94,14 @@ export async function generateMetadata({
   const description =
     category.metaDescription?.trim() ||
     category.description?.trim() ||
-    `Browse the latest ${category.name} products, deals, and coupons on DealSpark.`;
+    `Browse the latest ${category.name} products, deals, and coupons on Coupon Saga.`;
 
   return buildMetadata({
     title,
     description,
     path: `/category/${category.slug}`,
     imageUrl: category.iconUrl,
-    siteName: 'DealSpark',
+    siteName: 'Coupon Saga',
     ogType: 'website',
   });
 }

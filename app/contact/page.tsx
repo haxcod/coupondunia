@@ -15,7 +15,7 @@ export function generateMetadata(): Metadata {
   return buildMetadata({
     title: "Contact Us",
     description:
-      "Get in touch with the DealSpark team. Send us a question, a partnership idea, or a deal you would like us to feature.",
+      "Get in touch with the Coupon Saga team. Send us a question, a partnership idea, or a deal you would like us to feature.",
     path: "/contact",
   });
 }

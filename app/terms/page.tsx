@@ -12,7 +12,7 @@ export function generateMetadata(): Metadata {
   return buildMetadata({
     title: "Terms of Service",
     description:
-      "The terms and conditions that govern your use of DealSpark, including acceptable use, third-party links, and limitations of liability.",
+      "The terms and conditions that govern your use of Coupon Saga, including acceptable use, third-party links, and limitations of liability.",
     path: "/terms",
   });
 }
@@ -24,7 +24,7 @@ export default function TermsPage() {
         Terms of Service
       </h1>
       <p className="mt-4 text-secondary">
-        Please read these terms carefully before using DealSpark. By accessing
+        Please read these terms carefully before using Coupon Saga. By accessing
         or using the site, you agree to be bound by these terms.
       </p>
 
@@ -33,7 +33,7 @@ export default function TermsPage() {
           Acceptance of terms
         </h2>
         <p className="text-secondary">
-          Your use of DealSpark constitutes acceptance of these terms. If you do
+          Your use of Coupon Saga constitutes acceptance of these terms. If you do
           not agree, please discontinue use of the site.
         </p>
       </section>
@@ -41,7 +41,7 @@ export default function TermsPage() {
       <section className="mt-10 space-y-4">
         <h2 className="text-xl font-semibold text-foreground">Use of the site</h2>
         <p className="text-secondary">
-          DealSpark is provided for personal, non-commercial use. You agree not
+          Coupon Saga is provided for personal, non-commercial use. You agree not
           to misuse the site, interfere with its operation, or attempt to access
           it through automated means without permission.
         </p>
@@ -64,7 +64,7 @@ export default function TermsPage() {
           Limitation of liability
         </h2>
         <p className="text-secondary">
-          DealSpark is provided on an &ldquo;as is&rdquo; basis. We make no
+          Coupon Saga is provided on an &ldquo;as is&rdquo; basis. We make no
           warranties about the accuracy or completeness of listed offers and are
           not liable for any loss arising from your use of the site or
           third-party stores.

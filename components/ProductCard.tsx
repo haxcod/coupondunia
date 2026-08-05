@@ -1,21 +1,12 @@
 /**
- * ProductCard — the reusable product summary tile used across the Public_Site
- * (Req 2). It is a server component: the static shell (store name, title,
- * prices, discount badge) renders to HTML for SEO, and only the image fallback
- * is delegated to a tiny client child (`ProductCardImage`).
+ * ProductCard — the product tile used in "Featured Deals" and product listings,
+ * styled to the Coupon Saga design: a 1:1 image with a purple discount badge,
+ * store name, title, price with a savings line, and a "Shop Now" button.
  *
- * **Affiliate-URL confidentiality (Req 7.9 / Property 11).** This component is
- * driven by `ProductCardDTO`, which deliberately omits the affiliate URL. The
- * card therefore cannot leak it into markup. The card navigates to the product
- * detail page (`/product/[slug]`); the actual affiliate redirect is performed
- * later by the separate `ClickCTA` (Task 10.4) via `POST /api/public/click`.
- * When `hasAffiliateUrl` is false the "VIEW DEAL →" CTA renders disabled and
- * performs no navigation (Req 2.9).
- *
- * Visual spec (Req 2.1–2.5): white background, 12px radius, drop shadow, a 1:1
- * lazy image, store name, a 2-line truncated title, a bold current price, an
- * optional strikethrough original price, and an optional integer `%` discount
- * badge. Hover feedback is shadow/border only — no layout shift.
+ * Server component; only the image fallback (ProductCardImage) is a client
+ * child. Driven by ProductCardDTO, which omits the affiliate URL — the card
+ * links to /product/[slug] and the real redirect happens via the click API.
+ * When there is no affiliate URL the CTA renders disabled (Req 2.9).
  */
 import Link from 'next/link';
 
@@ -26,17 +17,15 @@ interface ProductCardProps {
   product: ProductCardDTO;
 }
 
-/** Indian-locale rupee formatter; drops the trailing `.00` for whole rupees. */
-const RUPEE_FORMAT = new Intl.NumberFormat('en-IN', {
+const RUPEE = new Intl.NumberFormat('en-IN', {
   style: 'currency',
   currency: 'INR',
   minimumFractionDigits: 0,
   maximumFractionDigits: 2,
 });
 
-/** Format an integer-paise amount into a display rupee string (Req 2.2). */
-function formatPaise(paise: number): string {
-  return RUPEE_FORMAT.format(paise / 100);
+function rupees(paise: number): string {
+  return RUPEE.format(paise / 100);
 }
 
 export function ProductCard({ product }: ProductCardProps) {
@@ -53,100 +42,74 @@ export function ProductCard({ product }: ProductCardProps) {
 
   const hasDiscountBadge =
     discountPercent !== null && discountPercent >= 1 && discountPercent <= 100;
-  const hasOriginalPrice =
-    originalPrice !== null && originalPrice > currentPrice;
+  const hasOriginalPrice = originalPrice !== null && originalPrice > currentPrice;
+  const savings = hasOriginalPrice ? originalPrice - currentPrice : 0;
 
   return (
-    <article className="flex flex-col overflow-hidden rounded-card bg-card shadow-sm transition-shadow duration-200 hover:shadow-md">
+    <article className="group flex flex-col overflow-hidden rounded-card border border-border bg-card transition-all duration-300 ease-out hover:-translate-y-1 hover:border-accent/40 hover:shadow-lg hover:shadow-accent/5">
       <Link
         href={`/product/${slug}`}
-        className="group flex flex-1 flex-col focus-visible:outline-none"
+        className="flex flex-1 flex-col focus-visible:outline-none"
       >
-        {/* 1:1 image container with lazy load + placeholder fallback (Req 2.1, 2.6, 2.7). */}
-        <div className="relative aspect-square w-full overflow-hidden bg-background">
-          <ProductCardImage src={primaryImageUrl} alt={title} />
+        <div className="relative aspect-square w-full overflow-hidden bg-surface">
+          {/* Scaling the frame contents keeps the card box static. */}
+          <div className="h-full w-full transition-transform duration-500 ease-out group-hover:scale-105">
+            <ProductCardImage src={primaryImageUrl} alt={title} />
+          </div>
           {hasDiscountBadge && (
-            <span className="absolute left-2 top-2 rounded-badge bg-accent px-2 py-0.5 text-xs font-semibold text-card">
-              {discountPercent}%
+            <span className="absolute left-3 top-3 rounded-badge bg-accent px-2.5 py-1 text-xs font-bold text-white">
+              {discountPercent}% OFF
             </span>
           )}
         </div>
 
-        <div className="flex flex-1 flex-col gap-1 p-3">
+        <div className="flex flex-1 flex-col p-4">
           {storeName && (
-            <p className="truncate text-xs font-medium uppercase tracking-wide text-secondary">
+            <p className="truncate text-xs font-semibold uppercase tracking-wide text-muted">
               {storeName}
             </p>
           )}
 
-          {/* Title truncated to 2 lines with trailing ellipsis (Req 2.1). */}
-          <h3 className="line-clamp-2 text-sm font-medium text-foreground transition-colors duration-200 group-hover:text-accent">
+          <h3 className="mt-1 line-clamp-2 text-sm font-semibold leading-snug text-foreground transition-colors duration-200 group-hover:text-accent">
             {title}
           </h3>
 
-          {/* Price block: bold current price + optional strikethrough original (Req 2.2, 2.3, 2.5). */}
-          <div className="mt-auto flex items-baseline gap-2 pt-1">
-            <span className="text-base font-bold text-foreground">
-              {formatPaise(currentPrice)}
-            </span>
-            {hasOriginalPrice && (
-              <span className="text-sm text-muted line-through">
-                {formatPaise(originalPrice)}
+          <div className="mt-auto pt-3">
+            <div className="flex items-baseline gap-2">
+              <span className="text-lg font-extrabold tracking-tight text-foreground">
+                {rupees(currentPrice)}
               </span>
+              {hasOriginalPrice && (
+                <span className="text-sm text-muted line-through">
+                  {rupees(originalPrice)}
+                </span>
+              )}
+            </div>
+            {savings > 0 && (
+              <p className="mt-0.5 text-xs font-semibold text-success">
+                Save {rupees(savings)}
+              </p>
             )}
           </div>
         </div>
       </Link>
 
-      {/* CTA region. Disabled (non-navigating) when no affiliate URL (Req 2.9).
-          The enabled affiliate redirect is wired by ClickCTA (Task 10.4); until
-          then the enabled CTA routes to the product detail page. */}
-      <div className="px-3 pb-3">
+      <div className="px-4 pb-4">
         {hasAffiliateUrl ? (
           <Link
             href={`/product/${slug}`}
-            className="flex w-full cursor-pointer items-center justify-center gap-1 rounded-control bg-accent px-3 py-2 text-sm font-semibold text-card transition-colors duration-200 hover:bg-accent-hover"
+            className="press flex w-full items-center justify-center rounded-control bg-accent px-3 py-2.5 text-sm font-semibold text-white hover:bg-accent-hover"
           >
-            VIEW DEAL
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth={2}
-              stroke="currentColor"
-              aria-hidden="true"
-              className="h-4 w-4"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3"
-              />
-            </svg>
+            Shop Now
           </Link>
         ) : (
           <button
             type="button"
             disabled
             aria-disabled="true"
-            className="flex w-full cursor-not-allowed items-center justify-center gap-1 rounded-control bg-border px-3 py-2 text-sm font-semibold text-muted"
+            className="flex w-full cursor-not-allowed items-center justify-center rounded-control bg-surface px-3 py-2.5 text-sm font-semibold text-muted"
           >
-            VIEW DEAL
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth={2}
-              stroke="currentColor"
-              aria-hidden="true"
-              className="h-4 w-4"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3"
-              />
-            </svg>
+            Shop Now
           </button>
         )}
       </div>

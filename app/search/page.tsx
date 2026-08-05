@@ -67,8 +67,8 @@ export async function generateMetadata({
     // happens through category/product/deal pages and the sitemap.
     title: query ? `Search results for “${query}”` : 'Search',
     description: query
-      ? `Products and coupons matching “${query}” on DealSpark.`
-      : 'Search products, deals, and coupons across DealSpark.',
+      ? `Products and coupons matching “${query}” on Coupon Saga.`
+      : 'Search products, deals, and coupons across Coupon Saga.',
     robots: { index: false, follow: true },
   };
 }

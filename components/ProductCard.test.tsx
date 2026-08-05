@@ -54,14 +54,16 @@ function makeProduct(overrides: Partial<ProductCardDTO> = {}): ProductCardDTO {
 beforeEach(() => cleanup());
 
 describe('ProductCard (Req 2.1, 2.7, 2.9)', () => {
-  it('applies the 12px card radius and drop shadow classes (Req 2.1)', () => {
+  it('applies the card radius and elevation classes (Req 2.1)', () => {
     const { container } = render(<ProductCard product={makeProduct()} />);
     const article = container.querySelector('article')!;
     expect(article).toBeInTheDocument();
     expect(article.className).toContain('rounded-card');
-    // Drop shadow at rest, deeper shadow on hover — shadow present, no layout shift.
-    expect(article.className).toContain('shadow-sm');
-    expect(article.className).toContain('hover:shadow-md');
+    // The design outlines the card at rest and deepens the shadow on hover, so
+    // elevation changes without reflowing the grid. The exact shadow step is a
+    // styling choice, so assert only that a hover shadow is applied.
+    expect(article.className).toContain('border');
+    expect(article.className).toMatch(/hover:shadow-(sm|md|lg|xl)/);
   });
 
   it('truncates the title to 2 lines (Req 2.1)', () => {
@@ -72,7 +74,7 @@ describe('ProductCard (Req 2.1, 2.7, 2.9)', () => {
 
   it('shows an integer % discount badge when a discount is present (Req 2.4)', () => {
     render(<ProductCard product={makeProduct({ discountPercent: 37 })} />);
-    expect(screen.getByText('37%')).toBeInTheDocument();
+    expect(screen.getByText('37% OFF')).toBeInTheDocument();
   });
 
   it('hides the discount badge when there is no discount', () => {
@@ -86,7 +88,7 @@ describe('ProductCard (Req 2.1, 2.7, 2.9)', () => {
     expect(struck).toBeInTheDocument();
   });
 
-  it('renders an enabled VIEW DEAL link when an affiliate URL exists', () => {
+  it('renders an enabled Shop Now link when an affiliate URL exists', () => {
     render(<ProductCard product={makeProduct({ hasAffiliateUrl: true })} />);
     // No disabled button is rendered in the CTA region.
     expect(screen.queryByRole('button')).not.toBeInTheDocument();
@@ -94,7 +96,7 @@ describe('ProductCard (Req 2.1, 2.7, 2.9)', () => {
 
   it('renders a disabled, non-navigating CTA when there is no affiliate URL (Req 2.9)', () => {
     render(<ProductCard product={makeProduct({ hasAffiliateUrl: false })} />);
-    const cta = screen.getByRole('button', { name: /view deal/i });
+    const cta = screen.getByRole('button', { name: /shop now/i });
     expect(cta).toBeDisabled();
     expect(cta).toHaveAttribute('aria-disabled', 'true');
     expect(cta.className).toContain('cursor-not-allowed');

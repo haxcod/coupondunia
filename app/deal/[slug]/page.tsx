@@ -122,14 +122,14 @@ export async function generateMetadata({
   const title = `${deal.headline} — ${deal.storeName}`;
   const description = deal.terms?.trim()
     ? deal.terms.trim().slice(0, 160)
-    : `Grab this ${deal.storeName} offer on DealSpark: ${deal.headline}.`;
+    : `Grab this ${deal.storeName} offer on Coupon Saga: ${deal.headline}.`;
 
   return buildMetadata({
     title,
     description,
     path: `/deal/${deal.slug}`,
     imageUrl: deal.storeLogoUrl,
-    siteName: 'DealSpark',
+    siteName: 'Coupon Saga',
     ogType: 'article',
   });
 }

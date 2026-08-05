@@ -1,7 +1,8 @@
 /*
  * Shared primary-navigation definition used by the desktop header nav and the
- * mobile menu so both surfaces stay in sync. Only routes that actually exist as
- * public pages are listed here.
+ * mobile menu so both surfaces stay in sync. Mirrors the Coupon Saga design
+ * header. "Stores" and "Blogs" are new sections; "Today's Deals" points at the
+ * existing deals listing.
  */
 export interface NavLink {
   label: string;
@@ -11,7 +12,7 @@ export interface NavLink {
 export const PRIMARY_NAV_LINKS: readonly NavLink[] = [
   { label: 'Home', href: '/' },
   { label: 'Categories', href: '/categories' },
-  { label: 'Coupons', href: '/deals' },
-  { label: 'About', href: '/about' },
-  { label: 'Contact', href: '/contact' },
+  { label: 'Stores', href: '/stores' },
+  { label: "Today's Deals", href: '/deals' },
+  { label: 'Blogs', href: '/blogs' },
 ];

@@ -1,51 +1,69 @@
 @import "tailwindcss";
 
 /*
- * DealSpark design system — token-driven (Req 26).
- * Tailwind v4 CSS-first config: tokens declared under `@theme` generate
- * semantic utilities (e.g. bg-background, bg-card, text-secondary,
- * rounded-card, max-w-content) consumed by ProductCard, Header, Footer, etc.
+ * Coupon Saga design system — token-driven. Values are taken from the design
+ * file: an indigo-purple brand (#5440E0) on a white canvas, near-black text,
+ * green "Verified" accents, and a purple footer. Tokens under @theme generate
+ * the semantic utilities (bg-accent, text-secondary, rounded-card, etc.) that
+ * every component consumes.
  */
 @theme {
-  /* Color tokens (Req 26.1, 26.2) */
-  --color-background: #f8f8f6;
+  /* Surfaces */
+  --color-background: #ffffff;
   --color-card: #ffffff;
-  --color-foreground: #1a1a1a; /* primary text */
-  --color-secondary: #6b6b6b; /* secondary text */
-  --color-muted: #9e9e9e; /* muted text */
-  --color-border: #e8e8e5;
-  --color-accent: #cd3232;
-  --color-accent-hover: #b02a2a;
-  --color-highlight: #0d9488; /* complementary teal for promo strip / accents */
-  --color-highlight-hover: #0f766e;
-  --color-success: #2e7d32;
-  --color-warning: #f57c00;
-  --color-error: #c62828;
-  --color-footer: #efefed; /* footer bg (Req 1.13, 20.5) */
-  --color-admin-sidebar: #1e1e1e; /* admin sidebar (Req 26.2) */
+  --color-surface: #f5f6fb; /* subtle inset: search fields, image wells */
+  --color-footer: #5440e0; /* purple footer */
 
-  /* Corner radii (Req 26.5) */
-  --radius-card: 12px; /* cards */
-  --radius-control: 8px; /* buttons, inputs, images */
-  --radius-badge: 100px; /* pill badges */
-  --radius-modal: 16px; /* modals */
+  /* Ink */
+  --color-foreground: #16161d; /* near-black text */
+  --color-secondary: #55555f; /* secondary text */
+  --color-muted: #8a8a95; /* muted text / captions */
+  --color-border: #e6e7ec;
 
-  /* Content width constraint (Req 26.6) */
+  /* Brand — indigo-purple */
+  --color-accent: #5440e0;
+  --color-accent-hover: #4433c4;
+  --color-brand-soft: #efedfd; /* light purple wash */
+
+  /* Kept for existing components; mapped into the new palette */
+  --color-highlight: #5440e0;
+  --color-highlight-hover: #4433c4;
+
+  /* Status */
+  --color-success: #16a34a; /* "Verified" green */
+  --color-success-soft: #e7f7eb;
+  --color-warning: #f59e0b;
+  --color-error: #dc2626;
+  --color-admin-sidebar: #1e1e1e;
+
+  /* Corner radii */
+  --radius-card: 12px;
+  --radius-control: 8px;
+  --radius-badge: 100px;
+  --radius-modal: 16px;
+
+  /* Layout */
   --container-content: 1200px;
 
-  /* Typography (Req 26.3/26.4) — Plus Jakarta Sans via next/font with system fallback */
+  /* Type — Poppins via next/font, with a system fallback */
   --font-sans:
-    var(--font-jakarta), system-ui, -apple-system, "Segoe UI", Roboto, Helvetica,
+    var(--font-poppins), system-ui, -apple-system, "Segoe UI", Roboto, Helvetica,
     Arial, sans-serif;
 }
 
-/*
- * Sticky-header offset: the fixed Header (Req 1.1) reserves this height so
- * page content is never hidden behind it (ui-ux-pro-max layout rule).
- * Tasks 10.2+ set the actual header height against this variable.
- */
 :root {
-  --header-height: 4rem;
+  --header-height: 4.5rem;
+
+  /*
+   * Motion tokens. One easing curve for entrances (decelerating, never bouncy)
+   * and one for interface feedback, so every transition on the site feels like
+   * it comes from the same hand.
+   */
+  --ease-out-soft: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
+  --dur-fast: 150ms;
+  --dur-mid: 300ms;
+  --dur-slow: 560ms;
 }
 
 body {
@@ -54,21 +72,12 @@ body {
   font-family: var(--font-sans);
 }
 
-/*
- * Keyboard focus indicator (Req 26.8): >= 2px thickness, accent color giving
- * >= 3:1 contrast against the light background, visible for the focus duration.
- * Scoped to keyboard focus so pointer interactions stay clean.
- */
+/* Keyboard focus ring — 2px accent, keyboard users only. */
 :focus-visible {
   outline: 2px solid var(--color-accent);
   outline-offset: 2px;
 }
 
-/*
- * Reduced-motion support (Req 26.10): disable non-essential animation and
- * transition while retaining instantaneous state changes for interaction.
- * Component-level behavior (e.g. hero auto-advance) also reads this preference.
- */
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
@@ -81,12 +90,274 @@ body {
 }
 
 /*
- * Minimal in-editor formatting styles for the admin rich-text editor
- * (Task 15.7, Req 16.13). Tailwind's preflight removes default heading/list
- * styling, so the TipTap editing surface needs these so authors can see the
- * structure (H2/H3, bullet and numbered lists) they are creating. Public
- * rendering of the sanitized HTML is styled separately on the product page.
+ * Motion
+ * ------
+ * The page-load sequence for above-the-fold content, which cannot rely on a
+ * scroll observer because it is already in view. Everything below the fold uses
+ * the <Reveal> component instead. The reduced-motion rule above collapses all of
+ * these to an instant state change.
  */
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Hero photo tiles settle in from below with a slight rotation overshoot. */
+@keyframes deal-in {
+  from {
+    opacity: 0;
+    transform: translateY(26px) scale(0.94);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.animate-rise {
+  animation: rise 620ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+.animate-fade {
+  animation: fade 700ms ease-out both;
+}
+.animate-deal-in {
+  animation: deal-in 640ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* Staggering helpers for a short entrance sequence. */
+.delay-1 {
+  animation-delay: 90ms;
+}
+.delay-2 {
+  animation-delay: 180ms;
+}
+.delay-3 {
+  animation-delay: 270ms;
+}
+
+/*
+ * Scroll reveals, as a progressive enhancement. `animation-timeline: view()`
+ * drives the animation from the element's own scroll position, so there is no
+ * JavaScript, no observer, and no hydration cost. Browsers without support (and
+ * anyone who prefers reduced motion) simply get the finished state — the class
+ * never hides content on its own.
+ */
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .reveal {
+      animation: rise linear both;
+      animation-timeline: view();
+      animation-range: entry 0% cover 26%;
+    }
+
+    /*
+     * Children of a .reveal-stagger group rise in sequence as the group scrolls
+     * in. Each position gets a slightly longer range, which reads as a stagger
+     * without needing any per-item markup. Beyond the 8th child the cadence
+     * repeats, which is imperceptible that far down a grid.
+     */
+    .reveal-stagger > * {
+      animation: rise linear both;
+      animation-timeline: view();
+      animation-range: entry 0% cover 24%;
+    }
+    .reveal-stagger > *:nth-child(2) { animation-range: entry 0% cover 28%; }
+    .reveal-stagger > *:nth-child(3) { animation-range: entry 0% cover 32%; }
+    .reveal-stagger > *:nth-child(4) { animation-range: entry 0% cover 36%; }
+    .reveal-stagger > *:nth-child(5) { animation-range: entry 0% cover 30%; }
+    .reveal-stagger > *:nth-child(6) { animation-range: entry 0% cover 34%; }
+    .reveal-stagger > *:nth-child(7) { animation-range: entry 0% cover 38%; }
+    .reveal-stagger > *:nth-child(8) { animation-range: entry 0% cover 42%; }
+  }
+}
+
+/*
+ * Loading placeholders sweep a highlight across themselves rather than pulsing
+ * their whole box, which reads as "working" instead of "blinking".
+ */
+@keyframes shimmer {
+  from {
+    background-position: 200% 0;
+  }
+  to {
+    background-position: -200% 0;
+  }
+}
+
+.skeleton {
+  background-image: linear-gradient(
+    90deg,
+    var(--color-surface) 0%,
+    color-mix(in srgb, var(--color-border) 55%, white) 50%,
+    var(--color-surface) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.6s linear infinite;
+}
+
+/*
+ * Press feedback. Applied to primary actions so a click registers physically
+ * without moving surrounding layout.
+ */
+.press {
+  transition:
+    background-color var(--dur-fast) var(--ease-standard),
+    transform var(--dur-fast) var(--ease-standard),
+    box-shadow var(--dur-fast) var(--ease-standard);
+}
+.press:active {
+  transform: scale(0.97);
+}
+
+/* Trailing arrows drift forward on hover to imply travel. */
+.nudge {
+  transition: transform var(--dur-mid) var(--ease-out-soft);
+}
+.group:hover .nudge {
+  transform: translateX(3px);
+}
+
+/*
+ * Images fade up as they paint instead of snapping in. Applied to the <img>
+ * that next/image renders, so it covers both cached and freshly loaded frames.
+ */
+.img-in {
+  animation: fade var(--dur-slow) var(--ease-out-soft) both;
+}
+
+/* The section heading rule draws itself out from the left. */
+@keyframes rule-draw {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+.rule-draw {
+  transform-origin: left center;
+}
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .rule-draw {
+      animation: rule-draw linear both;
+      animation-timeline: view();
+      animation-range: entry 0% cover 22%;
+    }
+  }
+}
+
+/*
+ * Partner logo ribbon — an endless right-to-left marquee.
+ *
+ * The track holds two identical groups and shifts by exactly half its own width,
+ * so the moment group A leaves, group B sits precisely where it started and the
+ * loop has no seam. Each group carries `min-width: 100%`, which is what keeps
+ * the ribbon full at any viewport: without it a short list would drift away and
+ * leave dead space at the right edge before wrapping.
+ *
+ * The edges are dissolved with a mask so logos fade in and out of the rail
+ * instead of being cut off by the container.
+ */
+@keyframes marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+.marquee {
+  position: relative;
+  overflow: hidden;
+  -webkit-mask-image: linear-gradient(
+    to right,
+    transparent 0,
+    #000 10%,
+    #000 90%,
+    transparent 100%
+  );
+  mask-image: linear-gradient(
+    to right,
+    transparent 0,
+    #000 10%,
+    #000 90%,
+    transparent 100%
+  );
+}
+
+.marquee-track {
+  display: flex;
+  width: max-content;
+  animation: marquee 38s linear infinite;
+  /* Promote the track so the loop composites on the GPU and never janks. */
+  will-change: transform;
+}
+
+.marquee-group {
+  display: flex;
+  flex: 0 0 auto;
+  min-width: 100%;
+  align-items: center;
+  justify-content: space-around;
+  gap: 4rem;
+}
+
+/* Settle the ribbon when a reader wants to look at one name. */
+.marquee:hover .marquee-track,
+.marquee:focus-within .marquee-track {
+  animation-play-state: paused;
+}
+
+.marquee-item {
+  transition:
+    color var(--dur-mid) var(--ease-standard),
+    opacity var(--dur-mid) var(--ease-standard);
+}
+.marquee-item:hover {
+  color: var(--color-accent);
+  opacity: 1;
+}
+
+/*
+ * The ribbon keeps scrolling even when the OS asks for reduced motion. It is the
+ * page's one piece of ambient, always-on motion and is meant to run unattended,
+ * so it is deliberately exempt from the global reduced-motion reset above. That
+ * reset uses `!important` on a universal selector, so the animation has to be
+ * re-asserted the same way to win.
+ *
+ * Pausing on hover or keyboard focus is what keeps this acceptable: it gives the
+ * "pause, stop, hide" control that auto-moving content is expected to offer.
+ */
+@media (prefers-reduced-motion: reduce) {
+  .marquee-track {
+    animation: marquee 38s linear infinite !important;
+    animation-play-state: running !important;
+  }
+  .marquee:hover .marquee-track,
+  .marquee:focus-within .marquee-track {
+    animation-play-state: paused !important;
+  }
+}
+
+/* In-editor formatting for the admin rich-text editor (TipTap). */
 .prose-admin :where(h2) {
   font-size: 1.25rem;
   font-weight: 600;

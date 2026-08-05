@@ -32,12 +32,18 @@ export interface DealsLoadMoreProps {
   pageSize?: number;
   /** Accessible label announced for the grid (e.g. "Deals"). */
   label?: string;
+  /**
+   * `grid` tiles the items (coupon cards); `stack` lists them full-width, which
+   * is what the "Today's Deals" design uses for its horizontal deal rows.
+   */
+  layout?: 'grid' | 'stack';
 }
 
 export function DealsLoadMore({
   items,
   pageSize = DEFAULT_PAGE_SIZE,
   label = 'Deals',
+  layout = 'grid',
 }: DealsLoadMoreProps) {
   const total = items.length;
   const [visibleCount, setVisibleCount] = useState(() =>
@@ -52,25 +58,49 @@ export function DealsLoadMore({
     setVisibleCount((count) => Math.min(count + pageSize, total));
   }
 
+  const revealed = items.slice(0, visibleCount).map((node, index) => (
+    // Order is stable and append-only, so the index is a safe key here.
+    <div role="listitem" key={index}>
+      {node}
+    </div>
+  ));
+
   return (
     <>
-      <ResponsiveGrid aria-label={label}>
-        {items.slice(0, visibleCount).map((node, index) => (
-          // Order is stable and append-only, so the index is a safe key here.
-          <div role="listitem" key={index}>
-            {node}
-          </div>
-        ))}
-      </ResponsiveGrid>
+      {layout === 'stack' ? (
+        <div role="list" aria-label={label} className="space-y-4">
+          {revealed}
+        </div>
+      ) : (
+        <ResponsiveGrid aria-label={label}>{revealed}</ResponsiveGrid>
+      )}
 
       {hasMore ? (
         <div className="mt-8 flex flex-col items-center gap-2">
           <button
             type="button"
             onClick={handleLoadMore}
-            className="inline-flex cursor-pointer items-center justify-center rounded-control border border-border bg-card px-6 py-3 text-sm font-semibold text-foreground transition-colors duration-200 hover:bg-background focus-visible:outline-2 focus-visible:outline-offset-2"
+            className={
+              layout === 'stack'
+                ? 'inline-flex cursor-pointer items-center justify-center gap-1.5 text-base font-semibold text-accent transition-colors duration-200 hover:text-accent-hover'
+                : 'inline-flex cursor-pointer items-center justify-center rounded-control border border-border bg-card px-6 py-3 text-sm font-semibold text-foreground transition-colors duration-200 hover:bg-background'
+            }
           >
-            Load More
+            {layout === 'stack' ? 'Load More Deals' : 'Load More'}
+            {layout === 'stack' ? (
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth={2.5}
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="h-4 w-4"
+                aria-hidden="true"
+              >
+                <path d="m6 9 6 6 6-6" />
+              </svg>
+            ) : null}
           </button>
           {/* Announce progress to assistive tech without stealing focus. */}
           <p aria-live="polite" className="text-xs text-secondary">

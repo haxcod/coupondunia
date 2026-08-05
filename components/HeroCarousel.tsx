@@ -34,6 +34,11 @@ export interface HeroBanner {
 export interface HeroCarouselProps {
   /** Active banners, pre-ordered by ascending display order (Req 1.3, 18.7). */
   banners: HeroBanner[];
+  /**
+   * Slides visible at once on sm+ viewports. The design pairs banners two-up on
+   * the inner pages; mobile always shows one. Defaults to 1.
+   */
+  perView?: 1 | 2;
 }
 
 /** Auto-advance interval in milliseconds (Req 1.4). */
@@ -55,7 +60,10 @@ function isActivatableLink(value: string | null | undefined): value is string {
   return parsed.protocol === 'http:' || parsed.protocol === 'https:';
 }
 
-export default function HeroCarousel({ banners }: HeroCarouselProps) {
+export default function HeroCarousel({
+  banners,
+  perView = 1,
+}: HeroCarouselProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
   const [reducedMotion, setReducedMotion] = useState(false);
@@ -140,7 +148,7 @@ export default function HeroCarousel({ banners }: HeroCarouselProps) {
     <section
       aria-roledescription="carousel"
       aria-label="Promotional banners"
-      className="relative w-full overflow-hidden rounded-card bg-card"
+      className="relative w-full overflow-hidden bg-card"
       onMouseEnter={pause}
       onMouseLeave={resume}
       onTouchStart={handleTouchStart}
@@ -150,9 +158,18 @@ export default function HeroCarousel({ banners }: HeroCarouselProps) {
     >
       {/* Slide track: translate by the active index. The reduced-motion media
           query in globals.css neutralizes this transition automatically. */}
+      {/*
+        The track shifts by one slide width per index. With `perView={2}` a slide
+        is half-width on sm+, so the shift is halved there — expressed as a CSS
+        variable so the two breakpoints can use different multipliers.
+      */}
       <div
-        className="flex transition-transform duration-500 ease-out"
-        style={{ transform: `translateX(-${currentIndex * 100}%)` }}
+        className={`flex gap-3 transition-transform duration-500 ease-out [transform:translateX(calc(var(--slide-index)*-100%))] ${
+          perView === 2
+            ? 'sm:[transform:translateX(calc(var(--slide-index)*-50%))]'
+            : ''
+        }`}
+        style={{ '--slide-index': currentIndex } as React.CSSProperties}
       >
         {banners.map((banner, index) => (
           <Slide
@@ -161,32 +178,43 @@ export default function HeroCarousel({ banners }: HeroCarouselProps) {
             isActive={index === currentIndex}
             position={index + 1}
             total={count}
+            perView={perView}
           />
         ))}
       </div>
 
       {hasMultiple && (
         <>
-          <button
-            type="button"
-            onClick={goPrev}
-            aria-label="Previous banner"
-            className="absolute left-2 top-1/2 z-10 flex h-8 w-8 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full bg-card/80 text-foreground shadow transition-colors duration-200 hover:bg-card focus-visible:bg-card sm:left-3 sm:h-10 sm:w-10"
-          >
-            <ChevronIcon direction="left" />
-          </button>
-          <button
-            type="button"
-            onClick={goNext}
-            aria-label="Next banner"
-            className="absolute right-2 top-1/2 z-10 flex h-8 w-8 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full bg-card/80 text-foreground shadow transition-colors duration-200 hover:bg-card focus-visible:bg-card sm:right-3 sm:h-10 sm:w-10"
-          >
-            <ChevronIcon direction="right" />
-          </button>
+          {/* The design's two-up strip has no arrow affordances; the dots below
+              carry navigation there. */}
+          {perView === 1 && (
+            <>
+              <button
+                type="button"
+                onClick={goPrev}
+                aria-label="Previous banner"
+                className="absolute left-2 top-1/2 z-10 flex h-8 w-8 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full bg-card/80 text-foreground shadow transition-colors duration-200 hover:bg-card focus-visible:bg-card sm:left-3 sm:h-10 sm:w-10"
+              >
+                <ChevronIcon direction="left" />
+              </button>
+              <button
+                type="button"
+                onClick={goNext}
+                aria-label="Next banner"
+                className="absolute right-2 top-1/2 z-10 flex h-8 w-8 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full bg-card/80 text-foreground shadow transition-colors duration-200 hover:bg-card focus-visible:bg-card sm:right-3 sm:h-10 sm:w-10"
+              >
+                <ChevronIcon direction="right" />
+              </button>
+            </>
+          )}
 
-          {/* Slide indicators */}
+          {/* Slide indicators — overlaid on a single slide, below a two-up strip. */}
           <div
-            className="absolute bottom-3 left-1/2 z-10 flex -translate-x-1/2 items-center gap-2"
+            className={
+              perView === 2
+                ? 'mt-5 flex items-center justify-center gap-2'
+                : 'absolute bottom-3 left-1/2 z-10 flex -translate-x-1/2 items-center gap-2'
+            }
             role="tablist"
             aria-label="Choose banner"
           >
@@ -220,6 +248,7 @@ interface SlideProps {
   isActive: boolean;
   position: number;
   total: number;
+  perView: 1 | 2;
 }
 
 /**
@@ -227,29 +256,34 @@ interface SlideProps {
  * CTA overlay. When the banner has a valid http(s) link the slide is wrapped in
  * an anchor; otherwise it is inert (Req 1.7, 1.14).
  */
-function Slide({ banner, isActive, position, total }: SlideProps) {
+function Slide({ banner, isActive, position, total, perView }: SlideProps) {
   const activatable = isActivatableLink(banner.linkUrl);
   const altText = banner.headline ?? '';
+  // Two-up slides keep the design's 16:9 artwork ratio; a single full-width
+  // slide is letterboxed to 3:1 so it does not dominate the viewport.
+  const ratio = perView === 2 ? 'aspect-[16/9]' : 'aspect-[16/9] sm:aspect-[3/1]';
+  const basis =
+    perView === 2 ? 'basis-full sm:basis-[calc(50%-0.375rem)]' : 'basis-full';
 
   const media = (
-    <div className="relative aspect-[16/9] w-full sm:aspect-[3/1]">
+    <div className={`relative w-full overflow-hidden rounded-card ${ratio}`}>
       {banner.mobileImageUrl ? (
         <>
           <Image
             src={banner.mobileImageUrl}
             alt={altText}
             fill
-            sizes="100vw"
+            sizes={perView === 2 ? "(max-width: 640px) 100vw, 600px" : "100vw"}
             priority={isActive}
-            className="object-cover sm:hidden"
+            className="img-in object-cover sm:hidden"
           />
           <Image
             src={banner.imageUrl}
             alt={altText}
             fill
-            sizes="100vw"
+            sizes={perView === 2 ? "(max-width: 640px) 100vw, 600px" : "100vw"}
             priority={isActive}
-            className="hidden object-cover sm:block"
+            className="img-in hidden object-cover sm:block"
           />
         </>
       ) : (
@@ -257,9 +291,9 @@ function Slide({ banner, isActive, position, total }: SlideProps) {
           src={banner.imageUrl}
           alt={altText}
           fill
-          sizes="100vw"
+          sizes={perView === 2 ? "(max-width: 640px) 100vw, 600px" : "100vw"}
           priority={isActive}
-          className="object-cover"
+          className="img-in object-cover"
         />
       )}
 
@@ -293,7 +327,7 @@ function Slide({ banner, isActive, position, total }: SlideProps) {
         aria-label={slideLabel}
         aria-hidden={!isActive}
         tabIndex={isActive ? undefined : -1}
-        className="group block w-full shrink-0 grow-0 basis-full cursor-pointer"
+        className={`group block w-full shrink-0 grow-0 cursor-pointer ${basis}`}
       >
         {media}
       </a>
@@ -307,7 +341,7 @@ function Slide({ banner, isActive, position, total }: SlideProps) {
       aria-roledescription="slide"
       aria-label={slideLabel}
       aria-hidden={!isActive}
-      className="group w-full shrink-0 grow-0 basis-full"
+      className={`group w-full shrink-0 grow-0 ${basis}`}
     >
       {media}
     </div>

@@ -53,7 +53,7 @@ import ClickCTA from '@/components/ClickCTA';
 
 /** Default affiliate disclosure shown when none is configured (Req 6.7). */
 const DEFAULT_AFFILIATE_DISCLOSURE =
-  'DealSpark may earn a commission when you buy through links on this page, at no extra cost to you.';
+  'Coupon Saga may earn a commission when you buy through links on this page, at no extra cost to you.';
 
 /** Fixed month abbreviations for deterministic `DD Mon YYYY` formatting (Req 6.11). */
 const MONTH_ABBREVIATIONS = [
@@ -139,7 +139,7 @@ export async function generateMetadata({
   const title = product.metaTitle?.trim() || product.title;
   const description =
     product.metaDescription?.trim() ||
-    `Shop ${product.title} from ${product.storeName} on DealSpark and find the latest price and offer.`;
+    `Shop ${product.title} from ${product.storeName} on Coupon Saga and find the latest price and offer.`;
 
   return buildMetadata({
     title,
