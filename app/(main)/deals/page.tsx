@@ -18,7 +18,6 @@ import { connection } from 'next/server';
 import Link from 'next/link';
 
 import {
-  getActiveBanners,
   getActiveCategoriesWithCounts,
   getActiveDealCards,
   getCategoryListing,
@@ -40,7 +39,6 @@ import {
 } from '@/lib/deal-filters';
 import type { DealType } from '@/lib/models/types';
 import { buildMetadata } from '@/lib/seo';
-import HeroCarousel from '@/components/HeroCarousel';
 import { DealRow } from '@/components/DealRow';
 import { DealsLoadMore } from '@/components/DealsLoadMore';
 import { BrandStrip } from '@/components/BrandStrip';
@@ -68,9 +66,7 @@ export default function DealsPage({
 }) {
   return (
     <main className="flex-1">
-      <Suspense fallback={<BannerSkeleton />}>
-        <DealBanners />
-      </Suspense>
+      <DealsHero />
 
       <BrandStrip />
 
@@ -86,15 +82,46 @@ export default function DealsPage({
   );
 }
 
-async function DealBanners() {
-  await connection();
-  const banners = await getActiveBanners();
-
-  if (banners.length === 0) return null;
-
+function DealsHero() {
   return (
-    <section className="mx-auto w-full max-w-content px-4 pt-6">
-      <HeroCarousel banners={banners} perView={2} />
+    <section className="relative overflow-hidden border-b border-border/50 bg-gradient-to-b from-brand-soft/40 via-card to-background py-10 sm:py-14">
+      <div className="mx-auto max-w-content px-4 text-center">
+        <div className="inline-flex items-center gap-2 rounded-full border border-accent/20 bg-accent/10 px-3.5 py-1 text-xs font-bold text-accent">
+          <span className="flex h-2 w-2 rounded-full bg-accent animate-pulse" />
+          Live Today &bull; Verified Coupons &amp; Deals
+        </div>
+
+        <h1 className="mt-3 text-3xl font-extrabold tracking-tight text-foreground sm:text-4xl md:text-5xl">
+          Today&apos;s <span className="italic text-accent">Hot Deals</span> &amp; Offers
+        </h1>
+
+        <p className="mx-auto mt-3 max-w-2xl text-sm text-secondary sm:text-base">
+          Handpicked promo codes, instant discounts, and limited-time savings tested and updated daily.
+        </p>
+
+        {/* Feature badges */}
+        <div className="mt-6 flex flex-wrap items-center justify-center gap-2 sm:gap-3 text-xs font-semibold text-foreground">
+          <span className="flex items-center gap-1.5 rounded-full border border-border bg-card px-3.5 py-1.5 shadow-xs">
+            <svg className="h-4 w-4 text-emerald-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
+            </svg>
+            100% Tested &amp; Working
+          </span>
+          <span className="flex items-center gap-1.5 rounded-full border border-border bg-card px-3.5 py-1.5 shadow-xs">
+            <svg className="h-4 w-4 text-amber-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z" />
+            </svg>
+            Exclusive Promo Codes
+          </span>
+          <span className="flex items-center gap-1.5 rounded-full border border-border bg-card px-3.5 py-1.5 shadow-xs">
+            <svg className="h-4 w-4 text-rose-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+              <circle cx="12" cy="12" r="9" />
+              <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6l4 2" />
+            </svg>
+            Expiring Soon Alerts
+          </span>
+        </div>
+      </div>
     </section>
   );
 }
@@ -454,13 +481,6 @@ function ToggleLink({
   );
 }
 
-function BannerSkeleton() {
-  return (
-    <div aria-hidden="true" className="mx-auto w-full max-w-content px-4 pt-6">
-      <div className="aspect-[16/9] w-full skeleton rounded-card" />
-    </div>
-  );
-}
 
 function DealsPageSkeleton() {
   return (

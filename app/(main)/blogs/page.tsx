@@ -4,29 +4,21 @@ import { connection } from "next/server";
 import Link from "next/link";
 import Image from "next/image";
 
-import HeroCarousel from "@/components/HeroCarousel";
 import { CategoryTile } from "@/components/CategoryTile";
 import { FeaturedBrands } from "@/components/FeaturedBrands";
-import { BrandStrip } from "@/components/BrandStrip";
 import { Newsletter } from "@/components/Newsletter";
-import { getActiveBanners, getHomepageData } from "@/lib/catalog";
+import { getHomepageData } from "@/lib/catalog";
 import { buildMetadata } from "@/lib/seo";
 
 /*
- * `/blogs` — the editorial page from the Coupon Saga design: Editor's Picks,
- * "Browse by categories" guide tiles, Latest Articles, Trending Topics, and
- * Popular Store Guides.
- *
- * There is no Blog model in the data layer, so the articles below are the
- * design's own editorial content. Only the banner carousel, the guide tiles, and
- * the store row read live data — when a Blog backend lands, PICKS and ARTICLES
- * are the seam to replace. Card artwork comes from the design file; the picks
- * carry their category badge baked into the image, matching the comp.
+ * `/blogs` — editorial magazine hub:
+ * Feature-lead article spotlight, trending topic guides, category guides,
+ * and latest articles.
  */
 
 export async function generateMetadata(): Promise<Metadata> {
   return buildMetadata({
-    title: "Blogs",
+    title: "Blogs & Guides",
     description:
       "Shopping tips, coupon guides, and money-saving advice from the Coupon Saga team.",
     path: "/blogs",
@@ -37,26 +29,26 @@ export async function generateMetadata(): Promise<Metadata> {
 
 const PICKS = [
   {
-    title: "10 Hidden Ways to Save Money Online in 2025",
-    date: "May 19, 2025",
+    title: "10 Hidden Ways to Save Money Online in 2026",
+    date: "May 19, 2026",
     readTime: "5 min read",
     image: "/figma/blog-pick-1.webp",
   },
   {
     title: "Top 20 Amazon Coupons You Can Use Right Now",
-    date: "May 19, 2025",
+    date: "May 19, 2026",
     readTime: "5 min read",
     image: "/figma/blog-pick-2.webp",
   },
   {
     title: "How to Stack Coupons & Save Even More",
-    date: "May 19, 2025",
+    date: "May 19, 2026",
     readTime: "5 min read",
     image: "/figma/blog-pick-3.webp",
   },
   {
-    title: "Myntra EORS 2025: Dates, Deals & What to Expect",
-    date: "May 19, 2025",
+    title: "Myntra EORS 2026: Dates, Deals & What to Expect",
+    date: "May 19, 2026",
     readTime: "5 min read",
     image: "/figma/blog-pick-4.webp",
   },
@@ -66,7 +58,7 @@ const ARTICLES = [
   {
     category: "Shopping Tips",
     title: "Backpack Essentials for College Students on a Budget",
-    date: "May 19, 2025",
+    date: "May 19, 2026",
     readTime: "5 min read",
     author: "Ananya Sharma",
     image: "/figma/blog-article-1.webp",
@@ -74,7 +66,7 @@ const ARTICLES = [
   {
     category: "Coupon Guides",
     title: "How to Find and Use Coupon Codes Like a Pro",
-    date: "May 19, 2025",
+    date: "May 19, 2026",
     readTime: "5 min read",
     author: "Rohit Ram",
     image: "/figma/blog-article-2.webp",
@@ -82,15 +74,15 @@ const ARTICLES = [
   {
     category: "Money Saving",
     title: "Cashback vs Coupons: Which One Saves You More?",
-    date: "May 19, 2025",
+    date: "May 19, 2026",
     readTime: "5 min read",
     author: "Neha Iyer",
     image: "/figma/blog-article-3.webp",
   },
   {
     category: "Season Sales",
-    title: "End of Season Sale 2025: Ultimate Shopping Guide",
-    date: "May 19, 2025",
+    title: "End of Season Sale 2026: Ultimate Shopping Guide",
+    date: "May 19, 2026",
     readTime: "5 min read",
     author: "Kapil Singh",
     image: "/figma/blog-article-4.webp",
@@ -118,37 +110,8 @@ const GUIDE_FALLBACK = [
 export default function BlogsPage() {
   return (
     <main className="flex-1">
-      <Suspense fallback={<BannerSkeleton />}>
-        <BlogBanners />
-      </Suspense>
-
-      <BrandStrip />
-
-      {/* Editor's Picks */}
-      <section className="reveal mx-auto w-full max-w-content px-4 py-12">
-        <SectionHead title="Editor's Picks" heading="h1" viewAllHref="/blogs" />
-        <ul className="reveal-stagger mt-6 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
-          {PICKS.map((pick) => (
-            <li key={pick.title}>
-              <article className="group flex h-full flex-col">
-                <div className="relative aspect-[16/9] w-full overflow-hidden rounded-control bg-surface">
-                  <Image
-                    src={pick.image}
-                    alt=""
-                    fill
-                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 300px"
-                    className="object-cover transition-transform duration-300 group-hover:scale-[1.03]"
-                  />
-                </div>
-                <h2 className="mt-3 line-clamp-2 text-sm font-bold leading-snug text-foreground">
-                  {pick.title}
-                </h2>
-                <ArticleMeta date={pick.date} readTime={pick.readTime} />
-              </article>
-            </li>
-          ))}
-        </ul>
-      </section>
+      {/* Magazine Editorial Hero */}
+      <BlogHero />
 
       {/* Browse by categories */}
       <Suspense fallback={<TilesSkeleton />}>
@@ -228,25 +191,130 @@ export default function BlogsPage() {
   );
 }
 
-/** Date + read-time line shared by both card styles. */
+function BlogHero() {
+  const leadPick = PICKS[0];
+  const sidePicks = PICKS.slice(1, 4);
+
+  return (
+    <section className="border-b border-border/60 bg-gradient-to-b from-brand-soft/30 via-background to-background py-10 sm:py-14">
+      <div className="mx-auto w-full max-w-content px-4">
+        {/* Editorial Top Heading */}
+        <div className="mb-8 text-center sm:text-left">
+          <div className="inline-flex items-center gap-2 rounded-full border border-accent/20 bg-accent/10 px-3.5 py-1 text-xs font-bold text-accent">
+            <svg className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.042A8.967 8.967 0 0 0 6 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 0 1 6 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 0 1 6-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0 0 18 18a8.967 8.967 0 0 0-6 2.292m0-14.25v14.25" />
+            </svg>
+            THE SAVINGS JOURNAL &bull; GUIDES &amp; ARTICLES
+          </div>
+
+          <h1 className="mt-3 text-3xl font-extrabold tracking-tight text-foreground sm:text-4xl md:text-5xl">
+            Smart Shopping <span className="italic text-accent">Guides &amp; Advice</span>
+          </h1>
+
+          <p className="mt-2 max-w-2xl text-sm text-secondary sm:text-base">
+            Insider saving hacks, seasonal shopping roundups, and practical advice to help you get the maximum value out of every order.
+          </p>
+        </div>
+
+        {/* Magazine Featured Story & Side Grid */}
+        <div className="grid gap-6 lg:grid-cols-12 lg:items-stretch">
+          {/* Main Lead Feature (8 cols on lg) */}
+          <article className="group relative flex flex-col overflow-hidden rounded-2xl border border-border bg-card shadow-sm transition-all duration-300 hover:shadow-lg lg:col-span-7 xl:col-span-8">
+            <div className="relative aspect-[16/10] w-full overflow-hidden bg-surface sm:aspect-[16/9]">
+              <Image
+                src={leadPick.image}
+                alt={leadPick.title}
+                fill
+                priority
+                sizes="(max-width: 1024px) 100vw, 800px"
+                className="object-cover transition-transform duration-500 group-hover:scale-105"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/25 to-transparent" />
+              <span className="absolute left-4 top-4 rounded-full bg-accent px-3 py-1 text-xs font-bold uppercase tracking-wider text-white shadow-md">
+                Featured Guide
+              </span>
+
+              <div className="absolute bottom-4 left-4 right-4 text-white sm:bottom-6 sm:left-6 sm:right-6">
+                <div className="flex items-center gap-3 text-xs text-white/80">
+                  <span className="font-semibold text-accent-hover">{leadPick.date}</span>
+                  <span>&bull;</span>
+                  <span>{leadPick.readTime}</span>
+                </div>
+                <h2 className="mt-2 text-xl font-extrabold leading-tight text-white transition-colors group-hover:text-white/90 sm:text-2xl lg:text-3xl">
+                  {leadPick.title}
+                </h2>
+                <p className="mt-2 line-clamp-2 text-xs text-white/80 sm:text-sm">
+                  Master the art of online savings with stacked coupons, seasonal promo timing, and cash back strategies used by retail insiders.
+                </p>
+              </div>
+            </div>
+          </article>
+
+          {/* Side Spotlight Columns (4 cols on lg) */}
+          <div className="flex flex-col gap-3 lg:col-span-5 xl:col-span-4">
+            <div className="flex items-center justify-between pb-1">
+              <span className="text-xs font-bold uppercase tracking-wider text-secondary">
+                Top Picks for You
+              </span>
+              <span className="text-xs font-semibold text-accent">Latest Updates</span>
+            </div>
+
+            <div className="flex flex-1 flex-col justify-between gap-3">
+              {sidePicks.map((pick) => (
+                <article
+                  key={pick.title}
+                  className="group flex items-center gap-3.5 rounded-xl border border-border bg-card p-3 shadow-xs transition-all duration-200 hover:-translate-y-0.5 hover:border-accent/60 hover:shadow-md"
+                >
+                  <div className="relative h-20 w-24 shrink-0 overflow-hidden rounded-lg bg-surface sm:h-22 sm:w-28">
+                    <Image
+                      src={pick.image}
+                      alt={pick.title}
+                      fill
+                      sizes="120px"
+                      className="object-cover transition-transform duration-300 group-hover:scale-105"
+                    />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-2 text-[11px] text-muted">
+                      <span>{pick.date}</span>
+                      <span>&bull;</span>
+                      <span>{pick.readTime}</span>
+                    </div>
+                    <h3 className="mt-1 line-clamp-2 text-xs font-bold leading-snug text-foreground transition-colors group-hover:text-accent sm:text-sm">
+                      {pick.title}
+                    </h3>
+                  </div>
+                </article>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Quick Topic Pills Bar */}
+        <div className="mt-8 flex items-center gap-2 overflow-x-auto pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:mt-10">
+          <span className="mr-1 shrink-0 text-xs font-bold text-foreground">
+            Popular Topics:
+          </span>
+          {TOPICS.map((topic) => (
+            <Link
+              key={topic.label}
+              href="/deals"
+              className="inline-flex shrink-0 items-center gap-1.5 rounded-full border border-border bg-card px-3.5 py-1.5 text-xs font-medium text-secondary transition-colors hover:border-accent hover:text-accent"
+            >
+              <span>{topic.label}</span>
+            </Link>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
 function ArticleMeta({ date, readTime }: { date: string; readTime: string }) {
   return (
-    <p className="mt-2 flex items-center gap-1.5 text-xs text-muted">
-      {date}
-      <span aria-hidden="true">•</span>
-      <svg
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth={2}
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        className="h-3 w-3"
-        aria-hidden="true"
-      >
-        <circle cx="12" cy="12" r="9" />
-        <path d="M12 7v5l3 2" />
-      </svg>
+    <p className="mt-2 flex items-center gap-2 text-xs text-muted">
+      <span>{date}</span>
+      <span aria-hidden="true">&bull;</span>
       {readTime}
     </p>
   );
@@ -273,19 +341,6 @@ function SectionHead({ title, viewAllHref, heading = "h2" }: SectionHeadProps) {
         View All
       </Link>
     </div>
-  );
-}
-
-async function BlogBanners() {
-  await connection();
-  const banners = await getActiveBanners();
-
-  if (banners.length === 0) return null;
-
-  return (
-    <section className="mx-auto w-full max-w-content px-4 pt-6">
-      <HeroCarousel banners={banners} perView={2} />
-    </section>
   );
 }
 
@@ -351,14 +406,6 @@ async function StoreGuides() {
       <SectionHead title="Popular Store Guides" viewAllHref="/stores" />
       <FeaturedBrands stores={stores} />
     </section>
-  );
-}
-
-function BannerSkeleton() {
-  return (
-    <div aria-hidden="true" className="mx-auto w-full max-w-content px-4 pt-6">
-      <div className="aspect-[16/9] w-full skeleton rounded-card" />
-    </div>
   );
 }
 
