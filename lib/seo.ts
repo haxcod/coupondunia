@@ -109,10 +109,10 @@ export const MAX_ALT_LENGTH = 125;
  * empty after trimming, the provided fallback (also clamped) is used so the
  * result is never empty for a content image.
  */
-export function contentAlt(subject: string, fallback = 'DealSpark image'): string {
+export function contentAlt(subject: string, fallback = 'Coupon Saga image'): string {
   const primary = subject.trim();
   const chosen = primary.length > 0 ? primary : fallback.trim();
-  const safe = chosen.length > 0 ? chosen : 'DealSpark image';
+  const safe = chosen.length > 0 ? chosen : 'Coupon Saga image';
   return safe.slice(0, MAX_ALT_LENGTH);
 }
 

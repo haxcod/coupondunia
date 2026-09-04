@@ -246,12 +246,12 @@ export function WhyChooseUs() {
       className="mx-auto w-full max-w-content px-4 py-12"
     >
       <h2 className="mb-6 text-xl font-bold tracking-tight text-foreground sm:text-2xl">
-        Why Choose CouponDunia
+        Why Choose Coupon Saga
       </h2>
       <div className="overflow-x-auto rounded-card border border-border bg-card shadow-sm">
         <table className="w-full min-w-[34rem] border-collapse text-left">
           <caption className="sr-only">
-            Feature comparison between CouponDunia and other coupon sites
+            Feature comparison between Coupon Saga and other coupon sites
           </caption>
           <thead>
             <tr className="border-b border-border bg-background">
@@ -265,7 +265,7 @@ export function WhyChooseUs() {
                 scope="col"
                 className="px-3 py-4 text-center text-sm font-bold text-accent sm:px-6"
               >
-                CouponDunia
+                Coupon Saga
               </th>
               <th
                 scope="col"

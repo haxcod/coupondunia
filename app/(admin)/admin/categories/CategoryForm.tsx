@@ -14,7 +14,7 @@
  * the administrator edits it manually (Req 15.5). The icon field uploads through
  * `POST /api/admin/upload` with a live preview, pre-checking type and size on
  * the client (Req 15.7, 15.8). A blank meta title defaults to
- * "[Category] Deals & Coupons | DealSpark" on submit (Req 15.9).
+ * "[Category] Deals & Coupons | Coupon Saga" on submit (Req 15.9).
  */
 import { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";

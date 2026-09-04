@@ -46,8 +46,8 @@ describe('loadSettings (get-or-return-default)', () => {
     const settings = await loadSettings();
 
     expect(settings.id).toBe('');
-    expect(settings.siteName).toBe('DealSpark');
-    expect(settings.defaultMetaTitleSuffix).toBe(' | DealSpark');
+    expect(settings.siteName).toBe('Coupon Saga');
+    expect(settings.defaultMetaTitleSuffix).toBe(' | Coupon Saga');
     expect(settings.adminEmailNotifications).toBe(true);
     expect(settings.social).toEqual({
       facebook: '',
@@ -69,7 +69,7 @@ describe('writeSettings (get-or-create singleton)', () => {
     expect(dto.id).not.toBe('');
     expect(dto.siteName).toBe('CouponDuniya');
     // Untouched fields fall back to schema defaults on insert.
-    expect(dto.defaultMetaTitleSuffix).toBe(' | DealSpark');
+    expect(dto.defaultMetaTitleSuffix).toBe(' | Coupon Saga');
     expect(dto.adminEmailNotifications).toBe(true);
 
     await expect(Settings.countDocuments()).resolves.toBe(1);

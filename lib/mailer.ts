@@ -130,7 +130,7 @@ export async function sendContactNotification(
     from: mailer.from,
     to: input.recipient,
     replyTo: input.email,
-    subject: `[DealSpark Contact] ${input.subject}`,
+    subject: `[Coupon Saga Contact] ${input.subject}`,
     text,
     html,
   });

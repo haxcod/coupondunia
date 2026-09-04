@@ -97,8 +97,8 @@ async function seedSettings(): Promise<void> {
     defaultAffiliateDisclosure:
       'Coupon Saga may earn a commission when you buy through links on this site.',
     social: {
-      facebook: 'https://facebook.com/dealspark',
-      instagram: 'https://instagram.com/dealspark',
+      facebook: 'https://facebook.com/couponsaga',
+      instagram: 'https://instagram.com/couponsaga',
       twitter: '',
       youtube: '',
     },
@@ -265,7 +265,7 @@ async function seedDemoContent(): Promise<void> {
         `longer than 300 characters, so we keep writing a little more filler text here ` +
         `to comfortably exceed that threshold for at least a few of the seeded products.</p>`,
       keyFeatures: ['1-year warranty', 'Free delivery', 'Top rated', 'Best seller'],
-      affiliateUrl: `https://www.${generateSlug(store.name)}.com/p/${generateSlug(p.title)}?aff=dealspark`,
+      affiliateUrl: `https://www.${generateSlug(store.name)}.com/p/${generateSlug(p.title)}?aff=couponsaga`,
       buttonLabel: 'VIEW DEAL',
       offerExpiresAt:
         p.expiresInDays !== undefined && p.expiresInDays !== null
@@ -319,7 +319,7 @@ async function seedDemoContent(): Promise<void> {
       categoryId: category._id,
       dealType: d.dealType,
       couponCode: d.couponCode ?? null,
-      destinationUrl: `https://www.${generateSlug(store.name)}.com/offers/${generateSlug(d.headline)}?aff=dealspark`,
+      destinationUrl: `https://www.${generateSlug(store.name)}.com/offers/${generateSlug(d.headline)}?aff=couponsaga`,
       discountValue: d.discountValue ?? null,
       buttonLabel: d.dealType === 'coupon_code' ? 'GET COUPON CODE' : 'GET DEAL',
       terms: 'Offer valid on select products only. Cannot be combined with other offers.',

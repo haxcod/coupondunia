@@ -82,8 +82,8 @@ export function buildCategoryBody(
 export function defaultMetaTitle(name: string): string {
   const trimmed = name.trim();
   return trimmed.length > 0
-    ? `${trimmed} Deals & Coupons | DealSpark`
-    : "Deals & Coupons | DealSpark";
+    ? `${trimmed} Deals & Coupons | Coupon Saga`
+    : "Deals & Coupons | Coupon Saga";
 }
 
 /** Shared 24×24 stroke icon wrapper (ui-ux-pro-max: consistent SVG icons). */

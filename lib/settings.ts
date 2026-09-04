@@ -69,13 +69,13 @@ export interface SettingsDTO {
  * been created yet so reads never observe a partial/empty object.
  */
 const DEFAULT_SETTINGS = {
-  siteName: 'DealSpark',
+  siteName: 'Coupon Saga',
   tagline: '',
   logoUrl: null,
   faviconUrl: null,
   contactEmail: '',
   adminEmailNotifications: true,
-  defaultMetaTitleSuffix: ' | DealSpark',
+  defaultMetaTitleSuffix: ' | Coupon Saga',
   defaultMetaDescription: '',
   ga4MeasurementId: '',
   searchConsoleCode: '',

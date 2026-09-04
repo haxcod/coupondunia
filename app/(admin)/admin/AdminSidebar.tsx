@@ -203,7 +203,7 @@ export default function AdminSidebar() {
           <line x1="7" y1="7" x2="7.01" y2="7" />
         </Icon>
       </span>
-      <span className="text-base font-semibold tracking-tight">DealSpark</span>
+      <span className="text-base font-semibold tracking-tight">Coupon Saga</span>
     </Link>
   );
 

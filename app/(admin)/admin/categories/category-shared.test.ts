@@ -4,21 +4,21 @@ import { buildCategoryBody, defaultMetaTitle } from "./category-shared";
 import type { AdminCategoryDetailView } from "./category-shared";
 
 describe("defaultMetaTitle (Req 15.9)", () => {
-  it("formats the default meta title as '[Category] Deals & Coupons | DealSpark'", () => {
+  it("formats the default meta title as '[Category] Deals & Coupons | Coupon Saga'", () => {
     expect(defaultMetaTitle("Electronics")).toBe(
-      "Electronics Deals & Coupons | DealSpark",
+      "Electronics Deals & Coupons | Coupon Saga",
     );
   });
 
   it("trims surrounding whitespace from the category name", () => {
     expect(defaultMetaTitle("  Home & Kitchen  ")).toBe(
-      "Home & Kitchen Deals & Coupons | DealSpark",
+      "Home & Kitchen Deals & Coupons | Coupon Saga",
     );
   });
 
   it("falls back to a generic title when the name is blank", () => {
-    expect(defaultMetaTitle("   ")).toBe("Deals & Coupons | DealSpark");
-    expect(defaultMetaTitle("")).toBe("Deals & Coupons | DealSpark");
+    expect(defaultMetaTitle("   ")).toBe("Deals & Coupons | Coupon Saga");
+    expect(defaultMetaTitle("")).toBe("Deals & Coupons | Coupon Saga");
   });
 });
 

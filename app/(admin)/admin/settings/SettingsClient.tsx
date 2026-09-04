@@ -454,7 +454,7 @@ function SeoForm({ initial }: { initial: SettingsView }) {
         onChange={(v) => set("defaultMetaTitleSuffix", v)}
         error={errors.defaultMetaTitleSuffix}
         maxLength={70}
-        hint="Appended to page titles, e.g. “ | DealSpark”."
+        hint="Appended to page titles, e.g. “ | Coupon Saga”."
       />
       <TextAreaField
         label="Default meta description"
