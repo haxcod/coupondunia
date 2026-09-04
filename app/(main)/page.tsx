@@ -4,7 +4,6 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
 
-import { SearchBar } from "@/components/SearchBar";
 import { CouponCard } from "@/components/CouponCard";
 import { ProductCard } from "@/components/ProductCard";
 import { CategoryTile } from "@/components/CategoryTile";
@@ -64,13 +63,7 @@ export default function Home() {
           Discover the best promo codes, discounts, and cashback offers from your
           favorite brands. Never pay full price again.
         </p>
-        <div className="animate-rise delay-2 mx-auto mt-8 max-w-2xl">
-          <SearchBar
-            cta="Find Deals"
-            size="lg"
-            placeholder="Search for stores, brands, or categories..."
-          />
-        </div>
+
 
         {/* The photo strip deals itself in left-to-right, like a hand of cards. */}
         <div

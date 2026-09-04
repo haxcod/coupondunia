@@ -1661,6 +1661,24 @@ export async function getHomepageData(): Promise<HomepageData> {
   return loadHomepageData();
 }
 
+/**
+ * Cached loader returning every store sorted alphabetically for the `/stores` initials directory.
+ */
+export async function getAllStores(): Promise<StoreDTO[]> {
+  'use cache';
+  cacheTag(CACHE_TAGS.homepage);
+  cacheLife(HOMEPAGE_CACHE_LIFE);
+
+  await connectToDatabase();
+  const docs = await Store.find()
+    .select('name slug logoUrl')
+    .sort({ name: 1 })
+    .lean()
+    .exec();
+
+  return (docs as unknown as LeanStore[]).map(toStoreDTO);
+}
+
 // -----------------------------------------------------------------------------
 // 7.4 — Product detail page data (Req 6, ISR 600s)
 // -----------------------------------------------------------------------------

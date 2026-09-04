@@ -9,6 +9,7 @@
  */
 import Link from 'next/link';
 
+import { HeaderSearch } from './HeaderSearch';
 import { HeaderShell } from './HeaderShell';
 import { Logo } from './Logo';
 import { PrimaryNav } from './PrimaryNav';
@@ -43,10 +44,14 @@ export function Header({ siteName = 'Coupon Saga', logoUrl = null }: HeaderProps
 
         {/* Right: search + accounts */}
         <div className="flex flex-1 items-center justify-end gap-2 sm:gap-3">
+          <div className="hidden sm:block">
+            <HeaderSearch />
+          </div>
+
           <Link
             href="/search"
             aria-label="Search"
-            className="flex h-10 w-10 items-center justify-center rounded-control text-foreground transition-all duration-200 hover:scale-110 hover:text-accent"
+            className="flex h-9 w-9 items-center justify-center rounded-control text-foreground transition-all duration-200 hover:text-accent sm:hidden"
           >
             <svg
               viewBox="0 0 24 24"
@@ -62,19 +67,6 @@ export function Header({ siteName = 'Coupon Saga', logoUrl = null }: HeaderProps
               <path d="m21 21-4.3-4.3" />
             </svg>
           </Link>
-
-          <button
-            type="button"
-            className="hidden text-sm font-medium text-foreground transition-colors duration-200 hover:text-accent sm:inline-flex"
-          >
-            Login
-          </button>
-          <button
-            type="button"
-            className="press hidden rounded-control bg-accent px-5 py-2.5 text-sm font-semibold text-white hover:bg-accent-hover hover:shadow-md hover:shadow-accent/20 sm:inline-flex"
-          >
-            JOIN FREE
-          </button>
 
           <MobileMenu links={PRIMARY_NAV_LINKS} />
         </div>
