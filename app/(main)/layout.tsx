@@ -4,11 +4,21 @@ import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { BackToTop } from "@/components/BackToTop";
 import { getSettings } from "@/lib/settings";
+import { getNavCategoryTree } from "@/lib/catalog";
 
 async function SiteHeader() {
   await connection();
-  const settings = await getSettings();
-  return <Header siteName={settings.siteName} logoUrl={settings.logoUrl} />;
+  const [settings, categories] = await Promise.all([
+    getSettings(),
+    getNavCategoryTree(),
+  ]);
+  return (
+    <Header
+      siteName={settings.siteName}
+      logoUrl={settings.logoUrl}
+      categories={categories}
+    />
+  );
 }
 
 async function SiteFooter() {

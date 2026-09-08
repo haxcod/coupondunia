@@ -1086,6 +1086,133 @@ export async function getActiveCategoriesWithCounts(): Promise<CategoryCardDTO[]
   return sortBy(cards, compareCategoriesByProductCountThenName);
 }
 
+/** A single subcategory item in the navigation tree. */
+export interface NavSubcategoryItem {
+  id: string;
+  name: string;
+  slug: string;
+}
+
+/** A root category and its active subcategories for the navbar mega menu. */
+export interface NavCategoryTreeItem {
+  id: string;
+  name: string;
+  slug: string;
+  iconUrl: string | null;
+  displayOrder: number;
+  subcategories: NavSubcategoryItem[];
+}
+
+const FALLBACK_NAV_CATEGORIES: NavCategoryTreeItem[] = [
+  {
+    id: 'electronics',
+    name: 'Electronics',
+    slug: 'electronics',
+    iconUrl: null,
+    displayOrder: 1,
+    subcategories: [
+      { id: 'laptops', name: 'Laptops', slug: 'electronics-laptops' },
+      { id: 'headphones', name: 'Headphones', slug: 'electronics-headphones' },
+    ],
+  },
+  {
+    id: 'fashion',
+    name: 'Fashion',
+    slug: 'fashion',
+    iconUrl: null,
+    displayOrder: 2,
+    subcategories: [
+      { id: 'men-clothing', name: 'Men Clothing', slug: 'fashion-men-clothing' },
+      { id: 'women-clothing', name: 'Women Clothing', slug: 'fashion-women-clothing' },
+    ],
+  },
+  {
+    id: 'mobiles',
+    name: 'Mobiles',
+    slug: 'mobiles',
+    iconUrl: null,
+    displayOrder: 3,
+    subcategories: [
+      { id: 'smartphones', name: 'Smartphones', slug: 'mobiles-smartphones' },
+    ],
+  },
+  {
+    id: 'home-kitchen',
+    name: 'Home & Kitchen',
+    slug: 'home-kitchen',
+    iconUrl: null,
+    displayOrder: 4,
+    subcategories: [],
+  },
+  {
+    id: 'beauty',
+    name: 'Beauty',
+    slug: 'beauty',
+    iconUrl: null,
+    displayOrder: 5,
+    subcategories: [],
+  },
+];
+
+/**
+ * Load all active root categories with their active subcategories for the navbar.
+ * Cached on a 300s ISR window and tagged with the categories tag.
+ */
+export async function getNavCategoryTree(): Promise<NavCategoryTreeItem[]> {
+  'use cache';
+  cacheLife({ stale: 300, revalidate: 300, expire: 3600 });
+  cacheTag(CACHE_TAGS.categories);
+
+  try {
+    await connectToDatabase();
+
+    const allCategories = await Category.find({ status: 'active' })
+      .select('name slug iconUrl parentId displayOrder')
+      .sort({ displayOrder: 1, name: 1 })
+      .lean()
+      .exec();
+
+    if (!allCategories || allCategories.length === 0) {
+      return FALLBACK_NAV_CATEGORIES;
+    }
+
+    const subcategoriesByParent = new Map<string, NavSubcategoryItem[]>();
+
+    for (const cat of allCategories) {
+      if (cat.parentId) {
+        const parentKey = String(cat.parentId);
+        const list = subcategoriesByParent.get(parentKey) ?? [];
+        list.push({
+          id: String(cat._id),
+          name: cat.name,
+          slug: cat.slug,
+        });
+        subcategoriesByParent.set(parentKey, list);
+      }
+    }
+
+    const parentCategories: NavCategoryTreeItem[] = [];
+    for (const cat of allCategories) {
+      if (!cat.parentId) {
+        const id = String(cat._id);
+        parentCategories.push({
+          id,
+          name: cat.name,
+          slug: cat.slug,
+          iconUrl: cat.iconUrl ?? null,
+          displayOrder: cat.displayOrder ?? 0,
+          subcategories: subcategoriesByParent.get(id) ?? [],
+        });
+      }
+    }
+
+    return parentCategories.length > 0 ? parentCategories : FALLBACK_NAV_CATEGORIES;
+  } catch {
+    return FALLBACK_NAV_CATEGORIES;
+  }
+}
+
+
 /**
  * Load every **active** deal projected as an affiliate-URL-free coupon-card DTO,
  * ordered for the `/deals` listing page by descending creation date (Req 10.1).

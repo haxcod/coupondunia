@@ -9,8 +9,16 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
 import type { NavLink } from './nav-links';
+import type { NavCategoryTreeItem } from '@/lib/catalog';
+import { CategoryMegaMenu } from './CategoryMegaMenu';
 
-export function PrimaryNav({ links }: { links: readonly NavLink[] }) {
+export function PrimaryNav({
+  links,
+  categories = [],
+}: {
+  links: readonly NavLink[];
+  categories?: NavCategoryTreeItem[];
+}) {
   const pathname = usePathname();
 
   return (
@@ -20,6 +28,17 @@ export function PrimaryNav({ links }: { links: readonly NavLink[] }) {
           link.href === '/'
             ? pathname === '/'
             : pathname === link.href || pathname.startsWith(`${link.href}/`);
+
+        if (link.label === 'Categories' && categories && categories.length > 0) {
+          return (
+            <CategoryMegaMenu
+              key={link.href}
+              categories={categories}
+              isActiveRoute={active}
+            />
+          );
+        }
+
         return (
           <Link
             key={link.href}

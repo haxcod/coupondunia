@@ -15,15 +15,22 @@ import { Logo } from './Logo';
 import { PrimaryNav } from './PrimaryNav';
 import { MobileMenu } from './MobileMenu';
 import { PRIMARY_NAV_LINKS } from './nav-links';
+import type { NavCategoryTreeItem } from '@/lib/catalog';
 
 export interface HeaderProps {
   /** Brand name for the logo alt text; the wordmark itself is the Coupon Saga lockup. */
   siteName?: string;
   /** Optional admin-uploaded logo image; falls back to the Coupon Saga lockup. */
   logoUrl?: string | null;
+  /** Active categories with subcategories for the mega menu. */
+  categories?: NavCategoryTreeItem[];
 }
 
-export function Header({ siteName = 'Coupon Saga', logoUrl = null }: HeaderProps) {
+export function Header({
+  siteName = 'Coupon Saga',
+  logoUrl = null,
+  categories = [],
+}: HeaderProps) {
   return (
     <HeaderShell>
       <div className="mx-auto flex h-full w-full max-w-content items-center px-4">
@@ -40,7 +47,7 @@ export function Header({ siteName = 'Coupon Saga', logoUrl = null }: HeaderProps
         </div>
 
         {/* Center: primary nav */}
-        <PrimaryNav links={PRIMARY_NAV_LINKS} />
+        <PrimaryNav links={PRIMARY_NAV_LINKS} categories={categories} />
 
         {/* Right: search + accounts */}
         <div className="flex flex-1 items-center justify-end gap-2 sm:gap-3">
@@ -68,7 +75,7 @@ export function Header({ siteName = 'Coupon Saga', logoUrl = null }: HeaderProps
             </svg>
           </Link>
 
-          <MobileMenu links={PRIMARY_NAV_LINKS} />
+          <MobileMenu links={PRIMARY_NAV_LINKS} categories={categories} />
         </div>
       </div>
     </HeaderShell>
