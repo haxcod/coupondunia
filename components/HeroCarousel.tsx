@@ -1,19 +1,16 @@
 'use client';
 
 /*
- * HeroCarousel (Task 10.5) — homepage hero banner carousel.
+ * HeroCarousel — Homepage hero banner carousel styled after Couponology.
  *
- * Behavior (Req 1.3–1.7, 1.14, 18.7, 26.10):
- * - Renders 1–10 active banners in the order received (caller supplies them
- *   already sorted by ascending display order — Req 1.3, 18.7).
- * - Auto-advances every 4 s only when there is more than one banner AND no
- *   pointer is hovering/touching AND the user has not requested reduced motion
- *   (Req 1.4, 1.5, 26.10).
- * - Pauses auto-advance while hovered/touched (Req 1.5).
- * - Renders nothing when the banner list is empty (Req 1.6/1.14 — the homepage
- *   hides the carousel when zero active banners exist).
- * - A banner with a valid http(s) link is activatable; a banner whose link is
- *   empty or malformed is rendered inert (non-navigating) (Req 1.7, 1.14).
+ * Features:
+ * - Widescreen lifestyle/deal banner presentation (aspect ~3.4:1 on desktop, ~2:1 on mobile).
+ * - Couponology-style offer overlay: Brand pill + serif discount headline + interactive
+ *   "USE CODE:" copyable badge with feedback.
+ * - Circular floating prev/next navigation chevrons.
+ * - Couponology bottom centered floating white pill with active elongated dot.
+ * - Auto-advances every 4s when >1 banner, pauses on hover/touch, disabled on reduced motion.
+ * - Fully accessible with role="region", role="tablist", role="tab", aria-roledescription="slide".
  */
 
 import Image from 'next/image';
@@ -29,14 +26,24 @@ export interface HeroBanner {
   ctaText?: string | null;
   linkUrl: string;
   linkTarget: LinkTarget;
+  /** Optional brand/store name (e.g. "Redbubble", "Amazon") */
+  brandName?: string | null;
+  /** Optional brand logo URL */
+  brandLogo?: string | null;
+  /** Optional coupon code (e.g. "BUBBLE25") */
+  couponCode?: string | null;
+  /** Optional discount callout badge (e.g. "25% OFF", "TOP DEAL") */
+  discountBadge?: string | null;
+  /** Optional horizontal overlay alignment */
+  overlayAlign?: 'left' | 'right' | 'center';
 }
 
 export interface HeroCarouselProps {
   /** Active banners, pre-ordered by ascending display order (Req 1.3, 18.7). */
   banners: HeroBanner[];
   /**
-   * Slides visible at once on sm+ viewports. The design pairs banners two-up on
-   * the inner pages; mobile always shows one. Defaults to 1.
+   * Slides visible at once on sm+ viewports. Inner pages support two-up;
+   * homepage defaults to 1.
    */
   perView?: 1 | 2;
 }
@@ -69,16 +76,10 @@ export default function HeroCarousel({
   const [reducedMotion, setReducedMotion] = useState(false);
 
   const count = banners.length;
+  // Derive safe active index without needing a cascading setState effect
+  const activeIndex = count > 0 ? currentIndex % count : 0;
 
-  // Keep the active index in range if the banner list shrinks between renders.
-  useEffect(() => {
-    if (currentIndex > count - 1) {
-      setCurrentIndex(count > 0 ? count - 1 : 0);
-    }
-  }, [count, currentIndex]);
-
-  // Track the user's reduced-motion preference (Req 26.10). Auto-advance is a
-  // non-essential animation, so it is disabled when reduced motion is on.
+  // Track the user's reduced-motion preference (Req 26.10).
   useEffect(() => {
     if (typeof window === 'undefined' || !window.matchMedia) return;
     const query = window.matchMedia('(prefers-reduced-motion: reduce)');
@@ -96,13 +97,15 @@ export default function HeroCarousel({
     [count],
   );
 
-  const goNext = useCallback(() => goTo(currentIndex + 1), [goTo, currentIndex]);
-  const goPrev = useCallback(() => goTo(currentIndex - 1), [goTo, currentIndex]);
+  const goNext = useCallback(() => {
+    if (count === 0) return;
+    setCurrentIndex((prev) => (prev + 1) % count);
+  }, [count]);
 
-  // Auto-advance timer: active only with >1 banner, not paused, and motion
-  // allowed (Req 1.4, 1.5, 26.10).
-  const goNextRef = useRef(goNext);
-  goNextRef.current = goNext;
+  const goPrev = useCallback(() => {
+    if (count === 0) return;
+    setCurrentIndex((prev) => ((prev - 1) % count + count) % count);
+  }, [count]);
 
   // Tracks the X position where a touch gesture began, for swipe detection.
   const touchStartXRef = useRef<number | null>(null);
@@ -110,7 +113,7 @@ export default function HeroCarousel({
   useEffect(() => {
     if (count <= 1 || isPaused || reducedMotion) return;
     const timer = window.setInterval(() => {
-      goNextRef.current();
+      setCurrentIndex((prev) => (prev + 1) % count);
     }, AUTO_ADVANCE_MS);
     return () => window.clearInterval(timer);
   }, [count, isPaused, reducedMotion]);
@@ -122,9 +125,7 @@ export default function HeroCarousel({
   const resume = () => setIsPaused(false);
   const hasMultiple = count > 1;
 
-  // Swipe support (mobile): record the start X, then on release advance/rewind
-  // when the horizontal travel exceeds a small threshold. Auto-advance is
-  // paused during the gesture and resumed afterwards.
+  // Swipe support (mobile)
   const SWIPE_THRESHOLD_PX = 40;
   const handleTouchStart = (event: React.TouchEvent) => {
     pause();
@@ -148,7 +149,7 @@ export default function HeroCarousel({
     <section
       aria-roledescription="carousel"
       aria-label="Promotional banners"
-      className="relative w-full overflow-hidden bg-card"
+      className="group/carousel relative w-full overflow-hidden bg-[#f4f4f7]"
       onMouseEnter={pause}
       onMouseLeave={resume}
       onTouchStart={handleTouchStart}
@@ -156,26 +157,19 @@ export default function HeroCarousel({
       onFocusCapture={pause}
       onBlurCapture={resume}
     >
-      {/* Slide track: translate by the active index. The reduced-motion media
-          query in globals.css neutralizes this transition automatically. */}
-      {/*
-        The track shifts by one slide width per index. With `perView={2}` a slide
-        is half-width on sm+, so the shift is halved there — expressed as a CSS
-        variable so the two breakpoints can use different multipliers.
-      */}
+      {/* Slide track */}
       <div
-        className={`flex gap-3 transition-transform duration-500 ease-out [transform:translateX(calc(var(--slide-index)*-100%))] ${
-          perView === 2
-            ? 'sm:[transform:translateX(calc(var(--slide-index)*-50%))]'
+        className={`flex transition-transform duration-500 ease-out transform-[translateX(calc(var(--slide-index)*-100%))] ${perView === 2
+            ? 'sm:transform-[translateX(calc(var(--slide-index)*-50%))]'
             : ''
-        }`}
-        style={{ '--slide-index': currentIndex } as React.CSSProperties}
+          }`}
+        style={{ '--slide-index': activeIndex } as React.CSSProperties}
       >
         {banners.map((banner, index) => (
           <Slide
             key={banner.id}
             banner={banner}
-            isActive={index === currentIndex}
+            isActive={index === activeIndex}
             position={index + 1}
             total={count}
             perView={perView}
@@ -185,15 +179,14 @@ export default function HeroCarousel({
 
       {hasMultiple && (
         <>
-          {/* The design's two-up strip has no arrow affordances; the dots below
-              carry navigation there. */}
+          {/* Couponology Circular Floating Navigation Arrows */}
           {perView === 1 && (
             <>
               <button
                 type="button"
                 onClick={goPrev}
                 aria-label="Previous banner"
-                className="absolute left-2 top-1/2 z-10 flex h-8 w-8 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full bg-card/80 text-foreground shadow transition-colors duration-200 hover:bg-card focus-visible:bg-card sm:left-3 sm:h-10 sm:w-10"
+                className="absolute left-2.5 sm:left-5 md:left-8 top-1/2 z-20 flex h-8 w-8 sm:h-10 sm:w-10 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full bg-white/95 text-[#2b2b2b] shadow-md border border-black/5 transition-all duration-200 hover:bg-white hover:scale-110 active:scale-95 focus-visible:ring-2 focus-visible:ring-accent"
               >
                 <ChevronIcon direction="left" />
               </button>
@@ -201,25 +194,25 @@ export default function HeroCarousel({
                 type="button"
                 onClick={goNext}
                 aria-label="Next banner"
-                className="absolute right-2 top-1/2 z-10 flex h-8 w-8 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full bg-card/80 text-foreground shadow transition-colors duration-200 hover:bg-card focus-visible:bg-card sm:right-3 sm:h-10 sm:w-10"
+                className="absolute right-2.5 sm:right-5 md:right-8 top-1/2 z-20 flex h-8 w-8 sm:h-10 sm:w-10 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full bg-white/95 text-[#2b2b2b] shadow-md border border-black/5 transition-all duration-200 hover:bg-white hover:scale-110 active:scale-95 focus-visible:ring-2 focus-visible:ring-accent"
               >
                 <ChevronIcon direction="right" />
               </button>
             </>
           )}
 
-          {/* Slide indicators — overlaid on a single slide, below a two-up strip. */}
+          {/* Couponology Centered Bottom Pill Indicators */}
           <div
             className={
               perView === 2
-                ? 'mt-5 flex items-center justify-center gap-2'
-                : 'absolute bottom-3 left-1/2 z-10 flex -translate-x-1/2 items-center gap-2'
+                ? 'mt-4 flex items-center justify-center gap-1.5 pb-2'
+                : 'absolute bottom-3 sm:bottom-4 left-1/2 z-20 flex -translate-x-1/2 items-center gap-1.5 rounded-full bg-white/90 px-3 py-1.5 shadow-sm border border-black/5 backdrop-blur-xs'
             }
             role="tablist"
             aria-label="Choose banner"
           >
             {banners.map((banner, index) => {
-              const selected = index === currentIndex;
+              const selected = index === activeIndex;
               return (
                 <button
                   key={banner.id}
@@ -228,11 +221,10 @@ export default function HeroCarousel({
                   aria-selected={selected}
                   aria-label={`Go to banner ${index + 1} of ${count}`}
                   onClick={() => goTo(index)}
-                  className={`h-2.5 cursor-pointer rounded-badge transition-all duration-200 ${
-                    selected
-                      ? 'w-6 bg-accent'
-                      : 'w-2.5 bg-muted hover:bg-secondary'
-                  }`}
+                  className={`cursor-pointer transition-all duration-300 ${selected
+                      ? 'h-1.5 w-4 sm:w-5 rounded-full bg-[#373737]'
+                      : 'h-1.5 w-1.5 rounded-full bg-[#d2d2d7] hover:bg-[#8e8e93]'
+                    }`}
                 />
               );
             })}
@@ -252,38 +244,70 @@ interface SlideProps {
 }
 
 /**
- * A single banner slide. Renders the responsive image plus optional headline /
- * CTA overlay. When the banner has a valid http(s) link the slide is wrapped in
- * an anchor; otherwise it is inert (Req 1.7, 1.14).
+ * Single banner slide matching Couponology's aesthetic.
  */
 function Slide({ banner, isActive, position, total, perView }: SlideProps) {
+  const [copied, setCopied] = useState(false);
   const activatable = isActivatableLink(banner.linkUrl);
-  const altText = banner.headline ?? '';
-  // Two-up slides keep the design's 16:9 artwork ratio; a single full-width
-  // slide is letterboxed to 3:1 so it does not dominate the viewport.
-  const ratio = perView === 2 ? 'aspect-[16/9]' : 'aspect-[16/9] sm:aspect-[3/1]';
+  const altText = banner.headline ?? banner.brandName ?? 'Promotion';
+
+  // Responsive widescreen aspect ratio inspired by Couponology
+  const ratio =
+    perView === 2
+      ? 'aspect-[16/9]'
+      : 'aspect-[2.2/1] sm:aspect-[2.8/1] md:aspect-[3.2/1] lg:aspect-[3.6/1] min-h-[220px] sm:min-h-[280px] md:min-h-[340px] max-h-[460px]';
   const basis =
     perView === 2 ? 'basis-full sm:basis-[calc(50%-0.375rem)]' : 'basis-full';
 
+  // Align overlay: defaults to left, or right if specified
+  const alignClass =
+    banner.overlayAlign === 'right'
+      ? 'items-end text-right'
+      : banner.overlayAlign === 'center'
+        ? 'items-center text-center'
+        : 'items-start text-left';
+
+  const handleCopyCode = (e: React.MouseEvent) => {
+    if (!banner.couponCode) return;
+    e.preventDefault();
+    e.stopPropagation();
+    try {
+      navigator.clipboard.writeText(banner.couponCode);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2200);
+    } catch {
+      // Fallback
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2200);
+    }
+  };
+
+  const hasOverlay =
+    Boolean(banner.headline) ||
+    Boolean(banner.brandName) ||
+    Boolean(banner.couponCode) ||
+    Boolean(banner.ctaText);
+
   const media = (
-    <div className={`relative w-full overflow-hidden rounded-card ${ratio}`}>
+    <div className={`relative w-full overflow-hidden ${ratio}`}>
+      {/* Background Image */}
       {banner.mobileImageUrl ? (
         <>
           <Image
             src={banner.mobileImageUrl}
             alt={altText}
             fill
-            sizes={perView === 2 ? "(max-width: 640px) 100vw, 600px" : "100vw"}
+            sizes={perView === 2 ? '(max-width: 640px) 100vw, 600px' : '100vw'}
             priority={isActive}
-            className="img-in object-cover sm:hidden"
+            className="object-cover object-center sm:hidden"
           />
           <Image
             src={banner.imageUrl}
             alt={altText}
             fill
-            sizes={perView === 2 ? "(max-width: 640px) 100vw, 600px" : "100vw"}
+            sizes={perView === 2 ? '(max-width: 640px) 100vw, 600px' : '100vw'}
             priority={isActive}
-            className="img-in hidden object-cover sm:block"
+            className="hidden object-cover object-center sm:block"
           />
         </>
       ) : (
@@ -291,24 +315,108 @@ function Slide({ banner, isActive, position, total, perView }: SlideProps) {
           src={banner.imageUrl}
           alt={altText}
           fill
-          sizes={perView === 2 ? "(max-width: 640px) 100vw, 600px" : "100vw"}
+          sizes={perView === 2 ? '(max-width: 640px) 100vw, 600px' : '100vw'}
           priority={isActive}
-          className="img-in object-cover"
+          className="object-cover object-center"
         />
       )}
 
-      {(banner.headline || banner.ctaText) && (
-        <div className="absolute inset-0 flex flex-col items-start justify-end gap-3 bg-gradient-to-t from-black/55 to-transparent p-6 sm:p-10">
+      {/* Subtle vignette/gradient for text legibility if overlay exists */}
+      {hasOverlay && (
+        <div
+          className={`absolute inset-0 pointer-events-none ${banner.overlayAlign === 'right'
+              ? 'bg-gradient-to-l from-black/40 via-transparent to-transparent'
+              : 'bg-gradient-to-r from-black/40 via-transparent to-transparent sm:from-black/30'
+            }`}
+        />
+      )}
+
+      {/* Couponology-Style Offer Overlay Card */}
+      {hasOverlay && (
+        <div
+          className={`absolute inset-0 z-10 flex flex-col justify-center px-6 py-6 sm:px-12 md:px-20 lg:px-28 ${alignClass}`}
+        >
+          {/* 1. Brand Badge Pill */}
+          {banner.brandName && (
+            <div className="inline-flex items-center gap-2 rounded bg-white/95 px-3 py-1 text-xs font-extrabold uppercase tracking-wider text-[#1e1e1e] shadow-sm backdrop-blur-xs sm:px-3.5 sm:py-1.5 sm:text-sm">
+              {banner.brandLogo ? (
+                <div className="relative h-4 w-4 shrink-0 sm:h-5 sm:w-5">
+                  <Image
+                    src={banner.brandLogo}
+                    alt={banner.brandName}
+                    fill
+                    className="object-contain"
+                  />
+                </div>
+              ) : (
+                <span className="flex h-4 w-4 sm:h-4.5 sm:w-4.5 items-center justify-center rounded-full bg-[#D92E59] text-[9px] sm:text-[10px] font-black text-white">
+                  {banner.brandName.slice(0, 2).toUpperCase()}
+                </span>
+              )}
+              <span>{banner.brandName}</span>
+            </div>
+          )}
+
+          {/* 2. Editorial Serif Discount Title */}
           {banner.headline && (
-            <h2 className="max-w-2xl text-xl font-bold text-white drop-shadow sm:text-3xl">
-              {banner.headline}
-            </h2>
+            <div className="mt-2.5 max-w-xl">
+              <h2 className="inline-block rounded bg-white/95 px-3 py-1.5 font-serif text-xl font-medium tracking-tight text-[#1e1e1e] shadow-sm backdrop-blur-xs sm:px-4 sm:py-2 sm:text-3xl md:text-4xl">
+                {banner.headline}
+              </h2>
+            </div>
           )}
-          {banner.ctaText && (
-            <span className="inline-flex items-center rounded-control bg-accent px-5 py-2.5 text-sm font-semibold text-white transition-colors duration-200 group-hover:bg-accent-hover">
-              {banner.ctaText}
-            </span>
-          )}
+
+          {/* 3. Coupon Code or CTA Pill */}
+          <div className="mt-3 flex flex-wrap items-center gap-2">
+            {banner.couponCode ? (
+              <div
+                onClick={handleCopyCode}
+                role="button"
+                tabIndex={0}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    handleCopyCode(e as unknown as React.MouseEvent);
+                  }
+                }}
+                aria-label={`Copy coupon code: ${banner.couponCode}`}
+                className="group/code inline-flex items-center overflow-hidden rounded border border-[#D92E59]/35 bg-white/95 shadow-sm backdrop-blur-xs transition-transform hover:scale-[1.02] active:scale-[0.98]"
+              >
+                {/* Left tab: USE CODE: */}
+                <span className="bg-[#D92E59] px-2.5 py-1 sm:px-3 sm:py-1.5 text-[10px] sm:text-xs font-bold uppercase tracking-wider text-white">
+                  USE CODE:
+                </span>
+                {/* Right tab: Code + Copy Indicator */}
+                <span className="flex items-center gap-1.5 px-3 py-1 sm:px-3.5 sm:py-1.5 font-mono text-xs sm:text-sm font-bold tracking-wider text-[#1e1e1e] group-hover/code:text-[#D92E59] transition-colors">
+                  {banner.couponCode}
+                  <span className="ml-1 text-[10px] font-sans font-semibold text-[#D92E59]">
+                    {copied ? '✓ COPIED!' : '📋'}
+                  </span>
+                </span>
+              </div>
+            ) : banner.ctaText ? (
+              <span className="inline-flex items-center gap-1.5 rounded bg-[#D92E59] px-4 py-1.5 sm:px-5 sm:py-2 text-xs sm:text-sm font-bold tracking-wide text-white shadow-sm transition-colors hover:bg-[#be254b]">
+                {banner.ctaText}
+                <svg
+                  className="h-3.5 w-3.5 sm:h-4 sm:w-4"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <line x1="5" y1="12" x2="19" y2="12" />
+                  <polyline points="12 5 19 12 12 19" />
+                </svg>
+              </span>
+            ) : null}
+
+            {banner.discountBadge && (
+              <span className="rounded bg-black/80 px-2.5 py-1 text-[11px] font-bold text-white shadow-sm backdrop-blur-xs sm:text-xs">
+                {banner.discountBadge}
+              </span>
+            )}
+          </div>
         </div>
       )}
     </div>
@@ -327,21 +435,20 @@ function Slide({ banner, isActive, position, total, perView }: SlideProps) {
         aria-label={slideLabel}
         aria-hidden={!isActive}
         tabIndex={isActive ? undefined : -1}
-        className={`group block w-full shrink-0 grow-0 cursor-pointer ${basis}`}
+        className={`group relative block w-full shrink-0 grow-0 cursor-pointer ${basis}`}
       >
         {media}
       </a>
     );
   }
 
-  // Inert slide: empty or malformed link, render non-navigating content
-  // (Req 1.7, 1.14).
+  // Inert slide (non-navigating)
   return (
     <div
       aria-roledescription="slide"
       aria-label={slideLabel}
       aria-hidden={!isActive}
-      className={`group w-full shrink-0 grow-0 ${basis}`}
+      className={`group relative w-full shrink-0 grow-0 ${basis}`}
     >
       {media}
     </div>
@@ -351,22 +458,22 @@ function Slide({ banner, isActive, position, total, perView }: SlideProps) {
 function ChevronIcon({ direction }: { direction: 'left' | 'right' }) {
   return (
     <svg
-      width="24"
-      height="24"
+      width="20"
+      height="20"
       viewBox="0 0 24 24"
       fill="none"
       stroke="currentColor"
-      strokeWidth="2"
+      strokeWidth="2.5"
       strokeLinecap="round"
       strokeLinejoin="round"
       aria-hidden="true"
       focusable="false"
-      className="h-5 w-5"
+      className="h-4 w-4 sm:h-5 sm:w-5"
     >
       {direction === 'left' ? (
         <polyline points="15 18 9 12 15 6" />
       ) : (
-        <polyline points="9 18 15 12 9 6" />
+        <polyline points="9 18 15 12 12 19" />
       )}
     </svg>
   );

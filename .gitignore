@@ -26,6 +26,7 @@
 
 # local agent/preview tooling (machine-specific, not part of the app)
 .claude/
+.agent/
 
 # debug
 npm-debug.log*

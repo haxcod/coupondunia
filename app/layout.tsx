@@ -1,12 +1,11 @@
 import type { Metadata } from "next";
-import { Poppins } from "next/font/google";
+import { Poppins, Playfair_Display } from "next/font/google";
 import "./globals.css";
 import { getSiteBaseUrl } from "@/lib/seo";
 /*
- * Poppins is the Coupon Saga typeface — the geometric sans used across the
- * design's headings and body. `next/font` self-hosts it with a system fallback
- * stack for graceful degradation. Exposed as `--font-poppins`, which the
- * `--font-sans` token in globals.css consumes.
+ * Poppins is the primary sans typeface; Playfair_Display provides the
+ * elegant editorial serif styling used in the Couponology hero carousel and
+ * section headers.
  */
 const poppins = Poppins({
   subsets: ["latin"],
@@ -22,6 +21,14 @@ const poppins = Poppins({
     "Arial",
     "sans-serif",
   ],
+});
+
+const playfair = Playfair_Display({
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-playfair",
+  weight: ["400", "500", "600", "700", "800"],
+  fallback: ["Georgia", "serif"],
 });
 
 export const metadata: Metadata = {
@@ -41,7 +48,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${poppins.variable} h-full antialiased`}>
+    <html lang="en" className={`${poppins.variable} ${playfair.variable} h-full antialiased`}>
       <body className="min-h-full bg-background text-foreground">
         {children}
       </body>

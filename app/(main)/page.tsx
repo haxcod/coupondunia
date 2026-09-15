@@ -10,7 +10,8 @@ import { CategoryTile } from "@/components/CategoryTile";
 import { StoreLogo } from "@/components/StoreLogo";
 import { BrandStrip } from "@/components/BrandStrip";
 import { Newsletter } from "@/components/Newsletter";
-import { getHomepageData } from "@/lib/catalog";
+import HeroCarousel, { type HeroBanner } from "@/components/HeroCarousel";
+import { getActiveBanners, getHomepageData } from "@/lib/catalog";
 import { getSettings } from "@/lib/settings";
 import {
   buildMetadata,
@@ -39,60 +40,79 @@ export async function generateMetadata(): Promise<Metadata> {
   });
 }
 
-/* The design's hero photo strip — the designer's own lifestyle shots. */
-const HERO_TILES = [
-  "/figma/hero-1.webp",
-  "/figma/hero-2.webp",
-  "/figma/hero-3.webp",
-  "/figma/hero-4.webp",
-  "/figma/hero-5.webp",
-  "/figma/hero-6.webp",
+/* Curated high-resolution banners styled after Couponology */
+const DEFAULT_HERO_BANNERS: HeroBanner[] = [
+  {
+    id: "banner-redbubble",
+    brandName: "Redbubble",
+    headline: "25% Off Sitewide Code.",
+    couponCode: "BUBBLE25",
+    ctaText: "Shop Now",
+    imageUrl: "/figma/banner-beauty.webp",
+    linkUrl: "https://www.redbubble.com",
+    linkTarget: "new_tab",
+    overlayAlign: "left",
+  },
+  {
+    id: "banner-wildflower",
+    brandName: "Wildflower",
+    headline: "Get 20% Off Sitewide",
+    couponCode: "CNWILD20",
+    ctaText: "Shop Cases",
+    imageUrl: "/figma/banner-backpack.webp",
+    linkUrl: "https://www.wildflowercases.com",
+    linkTarget: "new_tab",
+    overlayAlign: "left",
+  },
+  {
+    id: "banner-amazon",
+    brandName: "Amazon",
+    headline: "Great Indian Festival: Up To 90% Off",
+    couponCode: "FESTIVAL90",
+    ctaText: "Claim Deal",
+    imageUrl: "/figma/banner-amazon-festival.webp",
+    linkUrl: "https://www.amazon.in",
+    linkTarget: "new_tab",
+    overlayAlign: "left",
+  },
+  {
+    id: "banner-ajio",
+    brandName: "Ajio",
+    headline: "Flat 50% Off On Men's Fashion",
+    couponCode: "AJIOMEN50",
+    ctaText: "Explore Collection",
+    imageUrl: "/figma/banner-ajio-menswear.webp",
+    linkUrl: "https://www.ajio.com",
+    linkTarget: "new_tab",
+    overlayAlign: "left",
+  },
+  {
+    id: "banner-flipkart",
+    brandName: "Flipkart",
+    headline: "Big Billion Days: Extra ₹500 Off",
+    couponCode: "FLIP500",
+    ctaText: "Grab Coupon",
+    imageUrl: "/figma/banner-flipkart-sale.webp",
+    linkUrl: "https://www.flipkart.com",
+    linkTarget: "new_tab",
+    overlayAlign: "left",
+  },
+  {
+    id: "banner-lifestyle",
+    brandName: "Lifestyle",
+    headline: "Flat 50% Off On Season Clearance",
+    couponCode: "LIFE50",
+    ctaText: "Shop Sale",
+    imageUrl: "/figma/banner-lifestyle-50off.webp",
+    linkUrl: "https://www.lifestylestores.com",
+    linkTarget: "new_tab",
+    overlayAlign: "left",
+  },
 ];
 
 export default function Home() {
   return (
     <main className="flex-1">
-      {/* Hero — static, rendered in the shell. */}
-      <section className="mx-auto w-full max-w-content px-4 pb-6 pt-16 text-center">
-        {/* Entrance sequence: headline, then sub-copy, then the search field. */}
-        <h1 className="animate-rise mx-auto max-w-4xl text-4xl font-extrabold leading-[1.1] tracking-tight sm:text-5xl lg:text-6xl">
-          <span className="block text-accent">Save More With Verified</span>
-          <span className="block text-foreground">Coupons &amp; Deals</span>
-        </h1>
-        <p className="animate-rise delay-1 mx-auto mt-6 max-w-2xl text-base text-secondary sm:text-lg">
-          Discover the best promo codes, discounts, and cashback offers from your
-          favorite brands. Never pay full price again.
-        </p>
-
-
-        {/* The photo strip deals itself in left-to-right, like a hand of cards. */}
-        <div
-          aria-hidden="true"
-          className="mt-14 flex items-end justify-center gap-1 overflow-hidden sm:gap-3"
-        >
-          {HERO_TILES.map((src, index) => (
-            <div
-              key={src}
-              className={`animate-deal-in relative h-28 w-[15%] shrink-0 transition-transform duration-300 hover:-translate-y-2 sm:h-52 ${
-                index % 2 === 0 ? "-rotate-2" : "rotate-2"
-              }`}
-              style={{ animationDelay: `${300 + index * 70}ms` }}
-            >
-              <Image
-                src={src}
-                alt=""
-                fill
-                sizes="(max-width: 640px) 16vw, 220px"
-                priority={index < 3}
-                className="object-contain"
-              />
-            </div>
-          ))}
-        </div>
-      </section>
-
-      <BrandStrip />
-
       <Suspense fallback={<HomeFallback />}>
         <HomeContent />
       </Suspense>
@@ -104,15 +124,29 @@ export default function Home() {
 
 async function HomeContent() {
   await connection();
-  const [settings, homepage] = await Promise.all([
+  const [settings, homepage, dbBanners] = await Promise.all([
     getSettings(),
     getHomepageData(),
+    getActiveBanners().catch(() => []),
   ]);
 
   const { pillRowCategories, featuredProducts, todaysBestCoupons, popularStores } =
     homepage;
 
   const websiteJsonLd = buildWebSiteJsonLd({ siteName: settings.siteName });
+
+  const banners: HeroBanner[] =
+    dbBanners && dbBanners.length > 0
+      ? dbBanners.map((b) => ({
+          id: b.id,
+          imageUrl: b.imageUrl,
+          mobileImageUrl: b.mobileImageUrl,
+          headline: b.headline ?? null,
+          ctaText: b.ctaText ?? null,
+          linkUrl: b.linkUrl,
+          linkTarget: b.linkTarget,
+        }))
+      : DEFAULT_HERO_BANNERS;
 
   return (
     <>
@@ -121,13 +155,28 @@ async function HomeContent() {
         dangerouslySetInnerHTML={{ __html: stringifyJsonLd(websiteJsonLd) }}
       />
 
-      {/* Today's Trending Coupons & Deals */}
+      {/* Couponology-Style Full-Width Hero Carousel */}
+      <section className="w-full">
+        <HeroCarousel banners={banners} />
+      </section>
+
+      <BrandStrip />
+
+      {/* Today's Trending Coupons & Deals (Styled with Couponology typography) */}
       {todaysBestCoupons.length > 0 ? (
-        <section className="reveal mx-auto w-full max-w-content px-4 py-12">
-          <SectionHeading
-            title="Today's Trending Coupons & Deals"
-            subtitle="Explore our selection of handpicked coupons that cater to your preferences and shopping habits as per categories."
-          />
+        <section className="reveal mx-auto w-full max-w-content px-4 pt-10 pb-12">
+          <div className="flex flex-col items-center text-center">
+            <span className="font-sans text-xs font-extrabold uppercase tracking-wider text-[#D92E59]">
+              TOP DEALS
+            </span>
+            <h2 className="mt-1 text-3xl sm:text-4xl text-[#1e1e1e] tracking-tight">
+              <span className="font-serif font-normal">Our Best </span>
+              <span className="font-serif italic font-normal">Coupons</span>
+            </h2>
+            <p className="mt-2.5 max-w-2xl text-sm text-secondary">
+              Explore our selection of handpicked coupons that cater to your preferences and shopping habits as per categories.
+            </p>
+          </div>
           {/* Real categories, each linking into the filtered deals listing. */}
           <div className="mt-6 flex justify-center gap-6 overflow-x-auto border-b border-border pb-0 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
             <Link
@@ -258,16 +307,19 @@ function SectionHeading({ title, subtitle }: SectionHeadingProps) {
 /** Skeleton streamed in the static shell while homepage data loads. */
 function HomeFallback() {
   return (
-    <div aria-hidden="true" className="mx-auto w-full max-w-content px-4 py-12">
-      <div className="mx-auto h-8 w-72 skeleton rounded-control" />
-      <div className="mx-auto mt-3 h-4 w-96 max-w-full skeleton rounded" />
-      <div className="mt-8 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
-        {Array.from({ length: 6 }).map((_, index) => (
-          <div
-            key={index}
-            className="h-48 skeleton rounded-card border border-border"
-          />
-        ))}
+    <div aria-hidden="true" className="w-full">
+      <div className="w-full aspect-[2.2/1] sm:aspect-[2.8/1] md:aspect-[3.2/1] lg:aspect-[3.6/1] min-h-[220px] sm:min-h-[280px] md:min-h-[340px] max-h-[460px] skeleton" />
+      <div className="mx-auto w-full max-w-content px-4 py-12">
+        <div className="mx-auto h-8 w-72 skeleton rounded-control" />
+        <div className="mx-auto mt-3 h-4 w-96 max-w-full skeleton rounded" />
+        <div className="mt-8 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          {Array.from({ length: 6 }).map((_, index) => (
+            <div
+              key={index}
+              className="h-48 skeleton rounded-card border border-border"
+            />
+          ))}
+        </div>
       </div>
     </div>
   );

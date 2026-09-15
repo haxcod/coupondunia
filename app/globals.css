@@ -20,14 +20,14 @@
   --color-muted: #8a8a95; /* muted text / captions */
   --color-border: #e6e7ec;
 
-  /* Brand — indigo-purple */
-  --color-accent: #5440e0;
-  --color-accent-hover: #4433c4;
-  --color-brand-soft: #efedfd; /* light purple wash */
+  /* Brand — Couponology Red/Pink */
+  --color-accent: #D92E59;
+  --color-accent-hover: #be254b;
+  --color-brand-soft: #fdf2f5; /* light red/pink wash */
 
   /* Kept for existing components; mapped into the new palette */
-  --color-highlight: #5440e0;
-  --color-highlight-hover: #4433c4;
+  --color-highlight: #D92E59;
+  --color-highlight-hover: #be254b;
 
   /* Status */
   --color-success: #16a34a; /* "Verified" green */
@@ -49,6 +49,8 @@
   --font-sans:
     var(--font-poppins), system-ui, -apple-system, "Segoe UI", Roboto, Helvetica,
     Arial, sans-serif;
+  --font-serif:
+    var(--font-playfair), "Fraunces", Georgia, Cambria, "Times New Roman", Times, serif;
 }
 
 :root {
