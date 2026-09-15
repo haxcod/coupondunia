@@ -24,7 +24,7 @@
  *  - 25.10 (Admin renders on the client) and 25.11 (search results page is SSR):
  *    asserted by inspecting the component directives + a live search route call.
  */
-import { readFileSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
 import { describe, expect, it } from 'vitest';
@@ -61,7 +61,9 @@ describe('Admin pages render on the client (Req 25.10)', () => {
 
 describe('Search results page is server-side rendered (Req 25.11)', () => {
   it('the /search page is a Server Component (no "use client" directive)', () => {
-    const page = readSource('app', 'search', 'page.tsx');
+    const page = existsSync(join(ROOT, 'app', '(main)', 'search', 'page.tsx'))
+      ? readSource('app', '(main)', 'search', 'page.tsx')
+      : readSource('app', 'search', 'page.tsx');
     // A Server Component must NOT opt into the client with a leading directive.
     expect(page).not.toMatch(/^\s*['"]use client['"]/m);
   });

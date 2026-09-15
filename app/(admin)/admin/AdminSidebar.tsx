@@ -17,6 +17,7 @@
  */
 import { useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 
 interface NavItem {
@@ -195,15 +196,22 @@ export default function AdminSidebar() {
   const brand = (
     <Link
       href="/admin/dashboard"
-      className="flex cursor-pointer items-center gap-2 px-3 text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+      className="flex cursor-pointer items-center gap-2.5 px-3 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+      aria-label="Coupon Saga Admin"
     >
-      <span className="inline-flex h-8 w-8 items-center justify-center rounded-control bg-accent text-white">
-        <Icon>
-          <path d="M20.59 13.41 13.42 20.6a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z" />
-          <line x1="7" y1="7" x2="7.01" y2="7" />
-        </Icon>
+      <span className="inline-flex rounded-control bg-white px-2 py-1 shadow-sm">
+        <Image
+          src="/logo.png"
+          alt="Coupon Saga"
+          width={88}
+          height={33}
+          className="h-6 w-auto object-contain"
+          priority
+        />
       </span>
-      <span className="text-base font-semibold tracking-tight">Coupon Saga</span>
+      <span className="text-xs font-semibold uppercase tracking-wider text-white/70">
+        Admin
+      </span>
     </Link>
   );
 

@@ -37,12 +37,12 @@ export function Header({
         {/* Left: brand */}
         <div className="flex flex-1 items-center">
           {logoUrl ? (
-            <Link href="/" aria-label={`${siteName} home`} className="inline-flex">
+            <Link href="/" aria-label={`${siteName} home`} className="inline-flex items-center">
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={logoUrl} alt={siteName} className="h-9 w-auto" />
+              <img src={logoUrl} alt={siteName} className="h-9 w-auto object-contain" />
             </Link>
           ) : (
-            <Logo />
+            <Logo size="md" />
           )}
         </div>
 

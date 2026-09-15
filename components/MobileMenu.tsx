@@ -28,6 +28,7 @@ import { useEffect, useState } from 'react';
 import type { NavLink } from './nav-links';
 import type { NavCategoryTreeItem } from '@/lib/catalog';
 import { CategoryNavIcon } from './CategoryNavIcon';
+import { Logo } from './Logo';
 
 export interface MobileMenuProps {
   links: readonly NavLink[];
@@ -114,7 +115,7 @@ export function MobileMenu({ links, categories = [] }: MobileMenuProps) {
         className="fixed right-0 top-0 z-50 flex h-full w-80 max-w-[85vw] flex-col bg-card shadow-xl transition-transform duration-300 ease-out md:hidden"
       >
         <div className="flex h-[var(--header-height)] shrink-0 items-center justify-between border-b border-border px-4">
-          <span className="text-sm font-semibold text-foreground">Menu</span>
+          <Logo size="sm" />
           <button
             type="button"
             aria-label="Close navigation menu"

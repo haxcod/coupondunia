@@ -4,69 +4,51 @@
  * footer. Renders as a home link by default; pass `href={null}` for a bare mark.
  */
 import Link from 'next/link';
+import Image from 'next/image';
 
 interface LogoProps {
   tone?: 'dark' | 'light';
   href?: string | null;
   className?: string;
+  size?: 'sm' | 'md' | 'lg';
 }
 
-function TicketMark({ tone }: { tone: 'dark' | 'light' }) {
-  const ticket = tone === 'light' ? '#ffffff' : 'var(--color-accent)';
-  const glyph = tone === 'light' ? 'var(--color-accent)' : '#ffffff';
-  return (
-    <svg viewBox="0 0 40 40" className="h-8 w-8 shrink-0" aria-hidden="true">
-      <g transform="rotate(-8 20 20)">
-        <rect x="4" y="10" width="32" height="20" rx="5" fill={ticket} />
-        <rect
-          x="8"
-          y="14"
-          width="24"
-          height="12"
-          rx="3"
-          fill="none"
-          stroke={glyph}
-          strokeWidth="1"
-          strokeDasharray="2 2"
-          opacity="0.9"
-        />
-        <text
-          x="20"
-          y="25"
-          textAnchor="middle"
-          fontSize="15"
-          fontStyle="italic"
-          fontWeight="800"
-          fill={glyph}
-          fontFamily="var(--font-sans)"
-        >
-          S
-        </text>
-      </g>
-    </svg>
-  );
-}
+const SIZES = {
+  sm: { width: 80, height: 30, className: 'h-7 w-auto' },
+  md: { width: 104, height: 39, className: 'h-9 w-auto' },
+  lg: { width: 128, height: 48, className: 'h-11 w-auto' },
+};
 
-export function Logo({ tone = 'dark', href = '/', className }: LogoProps) {
+export function Logo({
+  tone = 'dark',
+  href = '/',
+  className = '',
+  size = 'md',
+}: LogoProps) {
+  const currentSize = SIZES[size] ?? SIZES.md;
+  const src = '/logo.png';
+
   const inner = (
-    <span className={`inline-flex items-center gap-2 ${className ?? ''}`}>
-      <TicketMark tone={tone} />
-      <span className="text-xl font-extrabold tracking-tight">
-        <span className={tone === 'light' ? 'text-white' : 'text-foreground'}>
-          Coupon
-        </span>
-        <span className={tone === 'light' ? 'text-white' : 'text-accent'}>
-          {' '}
-          Saga
-        </span>
-      </span>
+    <span className={`inline-flex items-center ${className}`}>
+      <Image
+        src={src}
+        alt="Coupon Saga"
+        width={currentSize.width}
+        height={currentSize.height}
+        className={`${currentSize.className} object-contain`}
+        priority
+      />
     </span>
   );
 
   if (!href) return inner;
 
   return (
-    <Link href={href} aria-label="Coupon Saga home" className="inline-flex">
+    <Link
+      href={href}
+      aria-label="Coupon Saga home"
+      className="inline-flex items-center focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+    >
       {inner}
     </Link>
   );

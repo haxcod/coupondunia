@@ -120,13 +120,13 @@ export function Footer({
                 <Link
                   href="/"
                   aria-label={`${siteName} home`}
-                  className="inline-flex"
+                  className="inline-flex items-center"
                 >
                   {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={logoUrl} alt={siteName} className="h-7 w-auto" />
+                  <img src={logoUrl} alt={siteName} className="h-7 w-auto object-contain" />
                 </Link>
               ) : (
-                <Logo />
+                <Logo size="sm" />
               )}
             </span>
 
