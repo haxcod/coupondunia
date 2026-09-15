@@ -251,11 +251,11 @@ function Slide({ banner, isActive, position, total, perView }: SlideProps) {
   const activatable = isActivatableLink(banner.linkUrl);
   const altText = banner.headline ?? banner.brandName ?? 'Promotion';
 
-  // Responsive widescreen aspect ratio inspired by Couponology
+  // Responsive widescreen aspect ratio inspired by Couponology (+10px height adjustment)
   const ratio =
     perView === 2
       ? 'aspect-[16/9]'
-      : 'aspect-[2.2/1] sm:aspect-[2.8/1] md:aspect-[3.2/1] lg:aspect-[3.6/1] min-h-[220px] sm:min-h-[280px] md:min-h-[340px] max-h-[460px]';
+      : 'aspect-[2.1/1] sm:aspect-[2.7/1] md:aspect-[3.1/1] lg:aspect-[3.45/1] min-h-[230px] sm:min-h-[290px] md:min-h-[350px] max-h-[470px]';
   const basis =
     perView === 2 ? 'basis-full sm:basis-[calc(50%-0.375rem)]' : 'basis-full';
 

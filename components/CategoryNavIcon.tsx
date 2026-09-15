@@ -18,6 +18,77 @@ const ICONS_MAP: { keywords: string[]; svg: React.ReactNode }[] = [
     ),
   },
   {
+    keywords: ['outdoor', 'garden', 'patio'],
+    svg: (
+      <>
+        <path d="M4 18h16M5 18V8a3 3 0 0 1 3-3h8a3 3 0 0 1 3 3v10M8 18v3M16 18v3M5 12h14" />
+      </>
+    ),
+  },
+  {
+    keywords: ['eyewear', 'glasses', 'optical', 'spectacle'],
+    svg: (
+      <>
+        <rect x="3" y="11" width="7" height="6" rx="2" />
+        <rect x="14" y="11" width="7" height="6" rx="2" />
+        <path d="M10 14h4" />
+        <path d="M4 11l2-5h12l2 5" />
+      </>
+    ),
+  },
+  {
+    keywords: ['accessories', 'sunglass'],
+    svg: (
+      <>
+        <circle cx="6.5" cy="14.5" r="3.5" />
+        <circle cx="17.5" cy="14.5" r="3.5" />
+        <path d="M10 14.5h4" />
+        <path d="M3 12.5 5 6h14l2 6.5" />
+      </>
+    ),
+  },
+  {
+    keywords: ['swimwear', 'bikini', 'swim'],
+    svg: (
+      <>
+        <path d="M6 5l3 5H3L6 5ZM18 5l3 5h-6l3-5ZM5 16h14l-7 5-7-5Z" />
+      </>
+    ),
+  },
+  {
+    keywords: ['flower', 'flora', 'plant', 'bouquet'],
+    svg: (
+      <>
+        <path d="M12 2a4 4 0 0 0-4 4c0 3 4 6 4 6s4-3 4-6a4 4 0 0 0-4-4Z" />
+        <path d="M12 12v9" />
+        <path d="M12 16a4 4 0 0 0 4-3" />
+        <path d="M12 18a4 4 0 0 1-4-3" />
+      </>
+    ),
+  },
+  {
+    keywords: ['decor', 'furniture', 'interior'],
+    svg: (
+      <>
+        <path d="M19 10V6a2 2 0 0 0-2-2H7a2 2 0 0 0-2 2v4" />
+        <path d="M4 14a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v4H4v-4Z" />
+        <path d="M6 18v3" />
+        <path d="M18 18v3" />
+      </>
+    ),
+  },
+  {
+    keywords: ['pet', 'dog', 'cat', 'animal'],
+    svg: (
+      <>
+        <path d="M4.5 9.5 7 4l4.5 3 4.5-3 2.5 5.5c0 5-3.5 9-6.5 9s-7.5-4-7.5-9Z" />
+        <circle cx="9" cy="11" r="1" />
+        <circle cx="15" cy="11" r="1" />
+        <path d="M11 14h2" />
+      </>
+    ),
+  },
+  {
     keywords: ['laptop', 'computer', 'macbook', 'pc'],
     svg: (
       <>
@@ -35,10 +106,10 @@ const ICONS_MAP: { keywords: string[]; svg: React.ReactNode }[] = [
     ),
   },
   {
-    keywords: ['mobile', 'smartphone', 'phone', 'iphone', 'android'],
+    keywords: ['mobile', 'smartphone', 'phone', 'iphone', 'android', 'tech'],
     svg: (
       <>
-        <rect width="14" height="20" x="5" y="2" rx="2.5" />
+        <rect width="12" height="20" x="6" y="2" rx="2.5" />
         <path d="M12 18h.01" />
       </>
     ),
@@ -47,9 +118,8 @@ const ICONS_MAP: { keywords: string[]; svg: React.ReactNode }[] = [
     keywords: ['women', 'dress', 'kurta', 'female', 'girl'],
     svg: (
       <>
-        <path d="M9 3h6l2 4-3 14H10L7 7l2-4Z" />
-        <path d="M9 3v4" />
-        <path d="M15 3v4" />
+        <path d="M9 3h6l2 4-2.5 14h-9L3 7l2-4h4Z" />
+        <path d="M9 3v4a3 3 0 0 0 6 0V3" />
       </>
     ),
   },
@@ -62,6 +132,14 @@ const ICONS_MAP: { keywords: string[]; svg: React.ReactNode }[] = [
     ),
   },
   {
+    keywords: ['kids apparel', 'kid apparel', 'child apparel'],
+    svg: (
+      <>
+        <path d="M12 4a2 2 0 0 1 2 2c0 .8-.5 1.5-1.2 1.8L18 10l-1.5 2L15 11v8a1 1 0 0 1-1 1h-4a1 1 0 0 1-1-1v-8L7.5 12 6 10l5.2-2.2A2 2 0 0 1 12 4Z" />
+      </>
+    ),
+  },
+  {
     keywords: ['fashion', 'cloth', 'apparel', 'wear', 'jeans'],
     svg: (
       <>
@@ -70,7 +148,7 @@ const ICONS_MAP: { keywords: string[]; svg: React.ReactNode }[] = [
     ),
   },
   {
-    keywords: ['electronic', 'tech', 'gadget'],
+    keywords: ['electronic', 'gadget'],
     svg: (
       <>
         <rect x="4" y="4" width="16" height="12" rx="2" />
@@ -81,7 +159,18 @@ const ICONS_MAP: { keywords: string[]; svg: React.ReactNode }[] = [
     ),
   },
   {
-    keywords: ['home', 'kitchen', 'furniture', 'decor', 'bed', 'bath'],
+    keywords: ['bed', 'bath'],
+    svg: (
+      <>
+        <path d="M2 4v16" />
+        <path d="M2 13h20" />
+        <path d="M22 8v12" />
+        <path d="M6 8h5a2 2 0 0 1 2 2v3H4v-3a2 2 0 0 1 2-2Z" />
+      </>
+    ),
+  },
+  {
+    keywords: ['home', 'kitchen'],
     svg: (
       <>
         <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
@@ -93,9 +182,9 @@ const ICONS_MAP: { keywords: string[]; svg: React.ReactNode }[] = [
     keywords: ['beauty', 'cosmetic', 'personal', 'makeup', 'care'],
     svg: (
       <>
-        <path d="M9 8V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v4" />
-        <rect x="6" y="8" width="12" height="13" rx="2" />
-        <path d="M10 13h4" />
+        <path d="m8 10 3.5-7 3.5 7" />
+        <rect x="6.5" y="10" width="11" height="11" rx="2" />
+        <line x1="6.5" y1="15" x2="17.5" y2="15" />
       </>
     ),
   },
@@ -103,8 +192,9 @@ const ICONS_MAP: { keywords: string[]; svg: React.ReactNode }[] = [
     keywords: ['shoe', 'footwear', 'sneaker'],
     svg: (
       <>
-        <path d="M3.5 14h17l-1.5 5h-14l-1.5-5Z" />
-        <path d="M4 14l3-6 5 2 4-2 3 6" />
+        <path d="M3 14h18v3a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-3Z" />
+        <path d="M3 14l3.5-6 4.5 2 4.5-2 3.5 6" />
+        <line x1="8" y1="10" x2="12" y2="10" />
       </>
     ),
   },
@@ -119,28 +209,14 @@ const ICONS_MAP: { keywords: string[]; svg: React.ReactNode }[] = [
     ),
   },
   {
-    keywords: ['travel', 'flight', 'hotel', 'tour'],
-    svg: (
-      <>
-        <path d="M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3.5c-.5-.5-2.5 0-4 1.5L13.5 8.5 5.3 6.7c-.8-.2-1.6.2-1.9 1-.3.8 0 1.7.7 2.1l5.5 3.8-3.4 3.4-3-.6c-.5-.1-1 .1-1.3.5-.3.4-.3.9 0 1.3l2.4 2.4c.4.4.9.4 1.3 0 .4-.3.6-.8.5-1.3l-.6-3 3.4-3.4 3.8 5.5c.4.7 1.3 1 2.1.7.8-.3 1.2-1.1 1-1.9z" />
-      </>
-    ),
-  },
-  {
-    keywords: ['grocery', 'supermarket', 'market', 'basket'],
-    svg: (
-      <>
-        <path d="M5 9h14l-1.5 9h-11L5 9Z" />
-        <path d="M9 9 7 4M15 9l2-5" />
-      </>
-    ),
-  },
-  {
     keywords: ['game', 'gaming', 'toy'],
     svg: (
       <>
-        <rect x="3" y="8" width="18" height="9" rx="4" />
-        <path d="M8 11v3M6.5 12.5h3M15.5 12h.01M17.5 13.5h.01" />
+        <rect x="2" y="6" width="20" height="12" rx="4" />
+        <path d="M6 12h4" />
+        <path d="M8 10v4" />
+        <circle cx="16" cy="10" r="1" fill="currentColor" />
+        <circle cx="18" cy="13" r="1" fill="currentColor" />
       </>
     ),
   },
@@ -149,7 +225,7 @@ const ICONS_MAP: { keywords: string[]; svg: React.ReactNode }[] = [
     svg: (
       <>
         <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z" />
-        <path d="M12 9v4M10 11h4" />
+        <path d="M4 12h3l1.5-3 2 6 2-4 1.5 2h3" />
       </>
     ),
   },
@@ -157,8 +233,10 @@ const ICONS_MAP: { keywords: string[]; svg: React.ReactNode }[] = [
     keywords: ['baby', 'kid', 'child'],
     svg: (
       <>
-        <circle cx="12" cy="8" r="5" />
-        <path d="M20 21a8 8 0 0 0-16 0" />
+        <path d="M9 3h6v2H9z" />
+        <path d="M8 5h8a2 2 0 0 1 2 2v12a3 3 0 0 1-3 3H9a3 3 0 0 1-3-3V7a2 2 0 0 1 2-2z" />
+        <path d="M10 10h4" />
+        <path d="M10 14h4" />
       </>
     ),
   },

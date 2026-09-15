@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import type { NavCategoryTreeItem } from '@/lib/catalog';
 import { CategoryNavIcon } from './CategoryNavIcon';
+import { CouponologyCategoryBar } from './CouponologyCategoryBar';
 
 interface CategoryMegaMenuProps {
   categories: NavCategoryTreeItem[];
@@ -71,9 +72,8 @@ export function CategoryMegaMenu({
         aria-expanded={isOpen}
         aria-haspopup="true"
         aria-current={isActiveRoute ? 'page' : undefined}
-        className={`group/cat relative inline-flex items-center gap-1.5 py-1.5 text-sm font-bold uppercase tracking-wider transition-colors duration-200 hover:text-[#D92E59] ${
-          isActiveRoute ? 'text-[#D92E59]' : 'text-[#2b2b2b]'
-        }`}
+        className={`group/cat relative inline-flex items-center gap-1.5 py-1.5 text-sm font-bold uppercase tracking-wider transition-colors duration-200 hover:text-[#D92E59] ${isActiveRoute ? 'text-[#D92E59]' : 'text-[#2b2b2b]'
+          }`}
       >
         <span>Categories</span>
         <svg
@@ -83,9 +83,8 @@ export function CategoryMegaMenu({
           strokeWidth={2.5}
           strokeLinecap="round"
           strokeLinejoin="round"
-          className={`h-3.5 w-3.5 transition-transform duration-200 ${
-            isOpen ? 'rotate-180 text-[#D92E59]' : 'text-[#8e8e93] group-hover/cat:text-[#D92E59]'
-          }`}
+          className={`h-3.5 w-3.5 transition-transform duration-200 ${isOpen ? 'rotate-180 text-[#D92E59]' : 'text-[#8e8e93] group-hover/cat:text-[#D92E59]'
+            }`}
           aria-hidden="true"
         >
           <polyline points="6 9 12 15 18 9" />
@@ -94,61 +93,17 @@ export function CategoryMegaMenu({
         {/* Active Underline */}
         <span
           aria-hidden="true"
-          className={`absolute -bottom-1 left-0 h-0.5 w-full origin-center bg-[#D92E59] transition-transform duration-300 ease-out ${
-            isActiveRoute ? 'scale-x-100' : 'scale-x-0 group-hover/cat:scale-x-100'
-          }`}
+          className={`absolute -bottom-1 left-0 h-0.5 w-full origin-center bg-[#D92E59] transition-transform duration-300 ease-out ${isActiveRoute ? 'scale-x-100' : 'scale-x-0 group-hover/cat:scale-x-100'
+            }`}
         />
       </Link>
 
-      {/* Horizontal Category Dropdown */}
-      {isOpen && categories.length > 0 && (
+      {/* Full-Width Couponology Category Mega Menu */}
+      {isOpen && (
         <div
-          className="absolute left-1/2 top-[calc(100%+8px)] z-50 -translate-x-1/2 pt-1 animate-in fade-in slide-in-from-top-2 duration-200"
-          style={{ width: 'min(900px, calc(100vw - 2rem))' }}
+          className="fixed left-0 right-0 top-[var(--header-height,4.5rem)] z-50 w-screen border-t border-gray-100 animate-in fade-in slide-in-from-top-1 duration-150 shadow-lg"
         >
-          <div className="overflow-hidden rounded-b-lg border-t-[3px] border-t-[#D92E59] bg-white shadow-[0_10px_40px_-10px_rgba(0,0,0,0.15)] ring-1 ring-black/5">
-            {/* Header */}
-            <div className="flex items-center justify-between border-b border-gray-100 px-6 py-4 bg-[#fcfcfc]">
-              <span className="text-xs font-black uppercase tracking-widest text-[#2b2b2b]">
-                Browse Categories
-              </span>
-              <Link
-                href="/categories"
-                onClick={() => setIsOpen(false)}
-                className="text-xs font-bold uppercase tracking-wider text-[#D92E59] transition-colors hover:text-[#be254b] hover:underline"
-              >
-                View all &rarr;
-              </Link>
-            </div>
-
-            {/* Multi-Column Categories Grid */}
-            <div className="grid grid-cols-2 gap-x-6 gap-y-3 p-6 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 bg-white">
-              {categories.map((cat) => (
-                <Link
-                  key={cat.id}
-                  href={`/category/${cat.slug}`}
-                  onClick={() => setIsOpen(false)}
-                  className="group/item flex items-center gap-3 rounded-md px-2 py-2 transition-all duration-150 hover:bg-[#f9f9f9]"
-                >
-                  <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#f4f4f7] text-[#555] transition-all duration-150 group-hover/item:bg-white group-hover/item:text-[#D92E59] group-hover/item:shadow-sm border border-transparent group-hover/item:border-gray-200">
-                    {cat.iconUrl ? (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img
-                        src={cat.iconUrl}
-                        alt=""
-                        className="h-4 w-4 object-contain"
-                      />
-                    ) : (
-                      <CategoryNavIcon name={cat.name} className="h-4 w-4" />
-                    )}
-                  </span>
-                  <span className="truncate text-[13px] font-bold tracking-wide text-[#2b2b2b] transition-colors duration-150 group-hover/item:text-[#D92E59]">
-                    {cat.name}
-                  </span>
-                </Link>
-              ))}
-            </div>
-          </div>
+          <CouponologyCategoryBar onItemClick={() => setIsOpen(false)} />
         </div>
       )}
     </div>
