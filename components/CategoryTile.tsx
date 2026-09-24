@@ -56,7 +56,7 @@ interface CategoryTileProps {
 export function CategoryTile({ name, slug, iconUrl }: CategoryTileProps) {
   return (
     <Link
-      href={`/deals?category=${slug}`}
+      href={`/category/${slug}`}
       className="group flex flex-col items-center gap-3 rounded-card border border-border bg-card px-4 py-6 text-center transition-all duration-200 hover:-translate-y-0.5 hover:border-accent hover:shadow-md"
     >
       <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-surface text-secondary shadow-sm transition-all duration-300 ease-out group-hover:scale-110 group-hover:bg-accent group-hover:text-white">

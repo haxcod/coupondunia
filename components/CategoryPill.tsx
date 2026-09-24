@@ -55,7 +55,7 @@ export interface CategoryPillProps {
 export function CategoryPill({ name, slug, iconUrl, count }: CategoryPillProps) {
   return (
     <Link
-      href={`/deals?category=${slug}`}
+      href={`/category/${slug}`}
       className="group flex items-center gap-3.5 rounded-full border border-border bg-card px-4 py-3 shadow-[0_2px_8px_-4px_rgba(0,0,0,0.06)] transition-all duration-200 hover:-translate-y-0.5 hover:border-accent hover:shadow-md hover:shadow-accent/10"
     >
       <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-brand-soft text-accent transition-transform duration-200 ease-out group-hover:scale-110">

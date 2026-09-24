@@ -207,7 +207,7 @@ export function MobileMenu({ links, categories = [] }: MobileMenuProps) {
                           <div key={cat.id} className="flex flex-col">
                             <div className="flex items-center justify-between rounded-lg px-3 py-1.5 hover:bg-surface">
                               <Link
-                                href={`/deals?category=${cat.slug}`}
+                                href={`/category/${cat.slug}`}
                                 onClick={() => setOpen(false)}
                                 className="flex flex-1 items-center gap-2 text-xs font-medium text-foreground hover:text-accent"
                               >
@@ -251,7 +251,7 @@ export function MobileMenu({ links, categories = [] }: MobileMenuProps) {
                                 {cat.subcategories.map((sub) => (
                                   <Link
                                     key={sub.id}
-                                    href={`/deals?category=${sub.slug}`}
+                                    href={`/category/${sub.slug}`}
                                     onClick={() => setOpen(false)}
                                     className="flex items-center gap-1.5 py-1 text-[11px] text-secondary transition-colors hover:text-accent"
                                   >

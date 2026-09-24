@@ -106,7 +106,7 @@ export function CategoryMegaMenu({
         <div
           className="fixed left-0 right-0 top-[var(--header-height,4.5rem)] z-50 w-screen border-t border-gray-100 animate-in fade-in slide-in-from-top-1 duration-150 shadow-lg"
         >
-          <CouponologyCategoryBar onItemClick={() => setIsOpen(false)} />
+          <CouponologyCategoryBar categories={categories} onItemClick={() => setIsOpen(false)} />
         </div>
       )}
     </div>
