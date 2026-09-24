@@ -299,7 +299,7 @@ function Slide({ banner, isActive, position, total, perView }: SlideProps) {
             fill
             sizes={perView === 2 ? '(max-width: 640px) 100vw, 600px' : '100vw'}
             priority={isActive}
-            className="object-cover object-center sm:hidden"
+            className="object-fill object-center sm:hidden"
           />
           <Image
             src={banner.imageUrl}
@@ -307,7 +307,7 @@ function Slide({ banner, isActive, position, total, perView }: SlideProps) {
             fill
             sizes={perView === 2 ? '(max-width: 640px) 100vw, 600px' : '100vw'}
             priority={isActive}
-            className="hidden object-cover object-center sm:block"
+            className="hidden object-fill object-center sm:block"
           />
         </>
       ) : (
@@ -317,7 +317,7 @@ function Slide({ banner, isActive, position, total, perView }: SlideProps) {
           fill
           sizes={perView === 2 ? '(max-width: 640px) 100vw, 600px' : '100vw'}
           priority={isActive}
-          className="object-cover object-center"
+          className="object-fill object-center"
         />
       )}
 
@@ -473,7 +473,7 @@ function ChevronIcon({ direction }: { direction: 'left' | 'right' }) {
       {direction === 'left' ? (
         <polyline points="15 18 9 12 15 6" />
       ) : (
-        <polyline points="9 18 15 12 12 19" />
+        <polyline points="9 18 15 12 9 6" />
       )}
     </svg>
   );
