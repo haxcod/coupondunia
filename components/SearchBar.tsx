@@ -7,7 +7,7 @@
  * for the homepage hero.
  */
 import { useRouter } from 'next/navigation';
-import { useState, type FormEvent } from 'react';
+import { useState, useTransition, type FormEvent } from 'react';
 
 export interface SearchBarProps {
   placeholder?: string;
@@ -26,12 +26,16 @@ export function SearchBar({
 }: SearchBarProps) {
   const router = useRouter();
   const [query, setQuery] = useState('');
+  const [isPending, startTransition] = useTransition();
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const trimmed = query.trim();
     if (trimmed.length === 0) return;
-    router.push(`/search?q=${encodeURIComponent(trimmed)}`);
+    
+    startTransition(() => {
+      router.push(`/search?q=${encodeURIComponent(trimmed)}`);
+    });
   }
 
   const fieldHeight = size === 'lg' ? 'h-14' : 'h-11';
@@ -71,36 +75,56 @@ export function SearchBar({
           onChange={(event) => setQuery(event.target.value)}
           placeholder={placeholder}
           autoComplete="off"
-          className={`${fieldHeight} w-full rounded-control border border-border bg-card pl-11 pr-4 text-sm text-foreground placeholder:text-muted transition-colors duration-200 focus:border-accent focus:outline-none [&::-webkit-search-cancel-button]:appearance-none [&::-webkit-search-decoration]:appearance-none`}
+          disabled={isPending}
+          className={`${fieldHeight} w-full rounded-control border border-border bg-card pl-11 pr-4 text-sm text-foreground placeholder:text-muted transition-colors duration-200 focus:border-accent focus:outline-none disabled:opacity-70 disabled:cursor-not-allowed [&::-webkit-search-cancel-button]:appearance-none [&::-webkit-search-decoration]:appearance-none`}
         />
       </div>
 
       {cta ? (
         <button
           type="submit"
-          className={`${fieldHeight} shrink-0 rounded-control bg-accent px-6 text-sm font-semibold text-white transition-colors duration-200 hover:bg-accent-hover`}
+          disabled={isPending}
+          className={`${fieldHeight} shrink-0 rounded-control bg-accent px-6 text-sm font-semibold text-white transition-colors duration-200 hover:bg-accent-hover disabled:opacity-80 disabled:cursor-not-allowed flex items-center justify-center gap-2`}
         >
-          {cta}
+          {isPending ? (
+            <>
+              <svg className="h-4 w-4 animate-spin" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+              </svg>
+              <span>Searching...</span>
+            </>
+          ) : (
+            cta
+          )}
         </button>
       ) : (
         <button
           type="submit"
           aria-label="Search"
-          className={`${fieldHeight} flex aspect-square shrink-0 items-center justify-center rounded-control bg-accent text-white transition-colors duration-200 hover:bg-accent-hover`}
+          disabled={isPending}
+          className={`${fieldHeight} flex aspect-square shrink-0 items-center justify-center rounded-control bg-accent text-white transition-colors duration-200 hover:bg-accent-hover disabled:opacity-80 disabled:cursor-not-allowed`}
         >
-          <svg
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth={2}
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            className="h-5 w-5"
-            aria-hidden="true"
-          >
-            <circle cx="11" cy="11" r="7" />
-            <path d="m21 21-4.3-4.3" />
-          </svg>
+          {isPending ? (
+            <svg className="h-5 w-5 animate-spin" viewBox="0 0 24 24">
+              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+            </svg>
+          ) : (
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth={2}
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              className="h-5 w-5"
+              aria-hidden="true"
+            >
+              <circle cx="11" cy="11" r="7" />
+              <path d="m21 21-4.3-4.3" />
+            </svg>
+          )}
         </button>
       )}
     </form>
