@@ -73,20 +73,32 @@ export async function generateMetadata({
   };
 }
 
-export default async function SearchPage({
+export default function SearchPage({
+  searchParams,
+}: {
+  searchParams: Promise<SearchParams>;
+}) {
+  return (
+    <main className="mx-auto w-full max-w-content flex-1 px-4 py-6 sm:py-8">
+      <Suspense fallback={<SearchFallback />}>
+        <SearchWrapper searchParams={searchParams} />
+      </Suspense>
+    </main>
+  );
+}
+
+async function SearchWrapper({
   searchParams,
 }: {
   searchParams: Promise<SearchParams>;
 }) {
   const params = await searchParams;
   const query = readParam(params.q);
-
+  
   return (
-    <main className="mx-auto w-full max-w-content flex-1 px-4 py-6 sm:py-8">
-      <Suspense key={query} fallback={<SearchFallback />}>
-        <SearchResults searchParams={searchParams} />
-      </Suspense>
-    </main>
+    <Suspense key={query} fallback={<SearchFallback />}>
+      <SearchResults searchParams={searchParams} />
+    </Suspense>
   );
 }
 
