@@ -20,14 +20,14 @@
   --color-muted: #8a8a95; /* muted text / captions */
   --color-border: #e6e7ec;
 
-  /* Brand — Couponology Red/Pink */
-  --color-accent: #D92E59;
-  --color-accent-hover: #be254b;
-  --color-brand-soft: #fdf2f5; /* light red/pink wash */
+  /* Brand — Coupon Saga Blue/Purple */
+  --color-accent: #5440e0;
+  --color-accent-hover: #4333b2;
+  --color-brand-soft: #eef1fc; /* light blue/purple wash */
 
   /* Kept for existing components; mapped into the new palette */
-  --color-highlight: #D92E59;
-  --color-highlight-hover: #be254b;
+  --color-highlight: #5440e0;
+  --color-highlight-hover: #4333b2;
 
   /* Status */
   --color-success: #16a34a; /* "Verified" green */

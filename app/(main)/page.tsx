@@ -166,7 +166,7 @@ async function HomeContent() {
       {todaysBestCoupons.length > 0 ? (
         <section className="reveal mx-auto w-full max-w-content px-4 pt-10 pb-12">
           <div className="flex flex-col items-center text-center">
-            <span className="font-sans text-xs font-extrabold uppercase tracking-wider text-[#D92E59]">
+            <span className="font-sans text-xs font-extrabold uppercase tracking-wider text-accent">
               TOP DEALS
             </span>
             <h2 className="mt-1 text-3xl sm:text-4xl text-[#1e1e1e] tracking-tight">

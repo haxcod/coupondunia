@@ -349,7 +349,7 @@ function Slide({ banner, isActive, position, total, perView }: SlideProps) {
                   />
                 </div>
               ) : (
-                <span className="flex h-4 w-4 sm:h-4.5 sm:w-4.5 items-center justify-center rounded-full bg-[#D92E59] text-[9px] sm:text-[10px] font-black text-white">
+                <span className="flex h-4 w-4 sm:h-4.5 sm:w-4.5 items-center justify-center rounded-full bg-accent text-[9px] sm:text-[10px] font-black text-white">
                   {banner.brandName.slice(0, 2).toUpperCase()}
                 </span>
               )}
@@ -379,22 +379,22 @@ function Slide({ banner, isActive, position, total, perView }: SlideProps) {
                   }
                 }}
                 aria-label={`Copy coupon code: ${banner.couponCode}`}
-                className="group/code inline-flex items-center overflow-hidden rounded border border-[#D92E59]/35 bg-white/95 shadow-sm backdrop-blur-xs transition-transform hover:scale-[1.02] active:scale-[0.98]"
+                className="group/code inline-flex items-center overflow-hidden rounded border border-accent/35 bg-white/95 shadow-sm backdrop-blur-xs transition-transform hover:scale-[1.02] active:scale-[0.98]"
               >
                 {/* Left tab: USE CODE: */}
-                <span className="bg-[#D92E59] px-2.5 py-1 sm:px-3 sm:py-1.5 text-[10px] sm:text-xs font-bold uppercase tracking-wider text-white">
+                <span className="bg-accent px-2.5 py-1 sm:px-3 sm:py-1.5 text-[10px] sm:text-xs font-bold uppercase tracking-wider text-white">
                   USE CODE:
                 </span>
                 {/* Right tab: Code + Copy Indicator */}
-                <span className="flex items-center gap-1.5 px-3 py-1 sm:px-3.5 sm:py-1.5 font-mono text-xs sm:text-sm font-bold tracking-wider text-[#1e1e1e] group-hover/code:text-[#D92E59] transition-colors">
+                <span className="flex items-center gap-1.5 px-3 py-1 sm:px-3.5 sm:py-1.5 font-mono text-xs sm:text-sm font-bold tracking-wider text-[#1e1e1e] group-hover/code:text-accent transition-colors">
                   {banner.couponCode}
-                  <span className="ml-1 text-[10px] font-sans font-semibold text-[#D92E59]">
+                  <span className="ml-1 text-[10px] font-sans font-semibold text-accent">
                     {copied ? '✓ COPIED!' : '📋'}
                   </span>
                 </span>
               </div>
             ) : banner.ctaText ? (
-              <span className="inline-flex items-center gap-1.5 rounded bg-[#D92E59] px-4 py-1.5 sm:px-5 sm:py-2 text-xs sm:text-sm font-bold tracking-wide text-white shadow-sm transition-colors hover:bg-[#be254b]">
+              <span className="inline-flex items-center gap-1.5 rounded bg-accent px-4 py-1.5 sm:px-5 sm:py-2 text-xs sm:text-sm font-bold tracking-wide text-white shadow-sm transition-colors hover:bg-accent-hover">
                 {banner.ctaText}
                 <svg
                   className="h-3.5 w-3.5 sm:h-4 sm:w-4"

@@ -63,7 +63,7 @@ export function CouponologyCategoryBar({
                   >
                     <span
                       className={`flex h-5 w-5 shrink-0 items-center justify-center transition-transform duration-150 group-hover:scale-110 ${
-                        isAll ? 'text-[#D92E59]' : 'text-[#444444] group-hover:text-[#D92E59]'
+                        isAll ? 'text-accent' : 'text-[#444444] group-hover:text-accent'
                       }`}
                     >
                       <CategoryNavIcon
@@ -74,8 +74,8 @@ export function CouponologyCategoryBar({
                     <span
                       className={`truncate leading-snug transition-colors duration-150 ${
                         isAll
-                          ? 'font-medium text-[#D92E59]'
-                          : 'text-[#333333] group-hover:text-[#D92E59]'
+                          ? 'font-medium text-accent'
+                          : 'text-[#333333] group-hover:text-accent'
                       }`}
                     >
                       {item.name}
