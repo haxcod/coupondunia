@@ -73,14 +73,17 @@ export async function generateMetadata({
   };
 }
 
-export default function SearchPage({
+export default async function SearchPage({
   searchParams,
 }: {
   searchParams: Promise<SearchParams>;
 }) {
+  const params = await searchParams;
+  const query = readParam(params.q);
+
   return (
     <main className="mx-auto w-full max-w-content flex-1 px-4 py-6 sm:py-8">
-      <Suspense fallback={<SearchFallback />}>
+      <Suspense key={query} fallback={<SearchFallback />}>
         <SearchResults searchParams={searchParams} />
       </Suspense>
     </main>
@@ -134,7 +137,6 @@ function SearchFallback() {
   return (
     <div className="flex flex-col gap-6" aria-hidden="true">
       <div className="h-9 w-64 animate-pulse rounded-control bg-border" />
-      <div className="h-12 w-full max-w-2xl animate-pulse rounded-control bg-border" />
       <div className="flex gap-4 border-b border-border pb-3">
         <div className="h-5 w-28 animate-pulse rounded-control bg-border" />
         <div className="h-5 w-28 animate-pulse rounded-control bg-border" />
