@@ -72,8 +72,9 @@ export function CategoryMegaMenu({
         aria-expanded={isOpen}
         aria-haspopup="true"
         aria-current={isActiveRoute ? 'page' : undefined}
-        className={`group/cat relative inline-flex items-center gap-1.5 py-1.5 text-sm font-bold uppercase tracking-wider transition-colors duration-200 hover:text-[#D92E59] ${isActiveRoute ? 'text-[#D92E59]' : 'text-[#2b2b2b]'
-          }`}
+        className={`group/cat relative inline-flex items-center gap-1.5 py-1 text-sm font-medium transition-colors duration-200 hover:text-accent ${
+          isActiveRoute ? 'text-accent' : 'text-foreground'
+        }`}
       >
         <span>Categories</span>
         <svg
@@ -83,8 +84,9 @@ export function CategoryMegaMenu({
           strokeWidth={2.5}
           strokeLinecap="round"
           strokeLinejoin="round"
-          className={`h-3.5 w-3.5 transition-transform duration-200 ${isOpen ? 'rotate-180 text-[#D92E59]' : 'text-[#8e8e93] group-hover/cat:text-[#D92E59]'
-            }`}
+          className={`h-3.5 w-3.5 transition-transform duration-200 ${
+            isOpen ? 'rotate-180 text-accent' : 'text-muted-foreground group-hover/cat:text-accent'
+          }`}
           aria-hidden="true"
         >
           <polyline points="6 9 12 15 18 9" />
@@ -93,8 +95,9 @@ export function CategoryMegaMenu({
         {/* Active Underline */}
         <span
           aria-hidden="true"
-          className={`absolute -bottom-1 left-0 h-0.5 w-full origin-center bg-[#D92E59] transition-transform duration-300 ease-out ${isActiveRoute ? 'scale-x-100' : 'scale-x-0 group-hover/cat:scale-x-100'
-            }`}
+          className={`absolute -bottom-1 left-0 h-0.5 w-full origin-center rounded-badge bg-accent transition-transform duration-300 ease-out ${
+            isActiveRoute ? 'scale-x-100' : 'scale-x-0 group-hover/cat:scale-x-100'
+          }`}
         />
       </Link>
 

@@ -73,7 +73,7 @@ export function CouponologyCategoryBar({
                 return (
                   <Link
                     key={item.id}
-                    href={isAll ? '/categories' : `/category/${item.slug}`}
+                    href={isAll ? '/categories' : `/deals?category=${item.slug}`}
                     onClick={onItemClick}
                     className="group flex items-center gap-2.5 text-[13px] font-normal transition-colors duration-150"
                   >

@@ -177,24 +177,7 @@ async function HomeContent() {
               Explore our selection of handpicked coupons that cater to your preferences and shopping habits as per categories.
             </p>
           </div>
-          {/* Real categories, each linking into the filtered deals listing. */}
-          <div className="mt-6 flex justify-center gap-6 overflow-x-auto border-b border-border pb-0 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-            <Link
-              href="/deals"
-              className="whitespace-nowrap border-b-2 border-accent pb-3 text-sm font-semibold text-accent"
-            >
-              All
-            </Link>
-            {pillRowCategories.slice(0, 7).map((category) => (
-              <Link
-                key={category.id}
-                href={`/deals?category=${encodeURIComponent(category.slug)}`}
-                className="whitespace-nowrap border-b-2 border-transparent pb-3 text-sm font-medium text-secondary transition-colors duration-200 hover:border-accent hover:text-accent"
-              >
-                {category.name}
-              </Link>
-            ))}
-          </div>
+
           <ul className="reveal-stagger mt-8 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {todaysBestCoupons.map((deal) => (
               <li key={deal.id}>

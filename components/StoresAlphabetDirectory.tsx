@@ -3,6 +3,7 @@
 import { useMemo, useState } from 'react';
 import Link from 'next/link';
 import type { StoreDTO } from '@/lib/catalog';
+import { StoreLogo } from '@/components/StoreLogo';
 
 interface StoresAlphabetDirectoryProps {
   stores: readonly StoreDTO[];
@@ -118,9 +119,9 @@ export function StoresAlphabetDirectory({
             <li key={store.id} className="min-w-0">
               <Link
                 href={`/search?q=${encodeURIComponent(store.name)}`}
-                className="group flex items-center gap-2 py-0.5 text-sm font-medium text-foreground transition-colors hover:text-accent"
+                className="group flex items-center gap-3 py-1.5 text-sm font-medium text-foreground transition-colors hover:text-accent"
               >
-                <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-border transition-colors group-hover:bg-accent" />
+                <StoreLogo name={store.name} logoUrl={store.logoUrl} size={32} />
                 <span className="truncate">{store.name}</span>
               </Link>
             </li>
