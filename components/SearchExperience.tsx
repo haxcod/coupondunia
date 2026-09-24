@@ -235,37 +235,7 @@ export function SearchExperience({
           )}
         </h1>
 
-        {/* Pre-filled, debounced search input (Req 11.1, 11.2). */}
-        <div className="relative w-full max-w-2xl">
-          <label htmlFor="search-page-input" className="sr-only">
-            Search products, deals, and stores
-          </label>
-          <svg
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth={2}
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            aria-hidden="true"
-            className="pointer-events-none absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-muted"
-          >
-            <circle cx="11" cy="11" r="7" />
-            <path d="m21 21-4.3-4.3" />
-          </svg>
-          <input
-            id="search-page-input"
-            type="search"
-            name="q"
-            value={query}
-            onChange={(event) => setQuery(event.target.value)}
-            placeholder="Search products, deals, stores..."
-            autoComplete="off"
-            maxLength={200}
-            aria-describedby={status === 'loading' ? 'search-status' : undefined}
-            className="h-12 w-full rounded-control border border-border bg-card pl-11 pr-4 text-base text-foreground placeholder:text-muted transition-colors duration-200 focus:border-accent focus:outline-none"
-          />
-        </div>
+
       </header>
 
       {/* Tabs: Products selected by default (Req 11.7). */}
